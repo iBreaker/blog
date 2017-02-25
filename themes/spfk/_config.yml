@@ -31,14 +31,14 @@ subnav:
   weibo: "#"
   google: "#"
   twitter: "#"
-  linkedin: "#"
-  facebook: "#"
+  #linkedin: "#"
+  #facebook: "#"
   rss: /atom.xml
-  pinterest: "#"
-  QQ: "#"
-  wechat: "#"
-  douban: "#"
-  pinboard: "#"
+  # pinterest: "#"
+  # QQ: "#"
+  # wechat: "#"
+  # douban: "#"
+  # pinboard: "#"
   # stackoverflow: "#"
   # Instagram: "#"
   # segmentfault: "#"
@@ -56,7 +56,7 @@ disqus:
 
 duoshuo: 
   on: true
-  domain: 
+  domain: breaker
   # 是否开启多说评论，http://duoshuo.com/create-site/
   # 使用上面网址登陆你的多说，然后创建站点，在 domain 中填入你设定的域名前半部分
   # http://<要填的部分>.duoshuo.com (domain只填上<>里的内容，不要填整个网址)
@@ -83,8 +83,8 @@ background:
 
 highlight_style:
   on: true
-  inline_code: 5
-  code_block: 5
+  inline_code: 7
+  code_block: 2
   # Set inline_code to style highlight text
   # Chose a highlight theme for code block
   # 通过 inline_code 切换内置文本高亮样式 Value: 0 - 9 可选
