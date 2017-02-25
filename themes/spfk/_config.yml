@@ -182,11 +182,11 @@ baidu_analytics:
 # http://ibruce.info/2015/04/04/busuanzi/
 visit_counter:
   on: true
-  site_visit: 海贼到访数
+  site_visit: 总访客数
   page_visit: 本页阅读量
 
 # A标签提示
 TipTitle: true
 
 # Loading
-# Loading: true
+Loading: true
