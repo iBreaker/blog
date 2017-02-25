@@ -91,7 +91,7 @@ highlight_style:
   # 通过 code_block 切换内置代码高亮配色主题  Value: 0 - 4 
 
 blockquote_style:
-  #on: true
+  on: true
   blockquote: 1  # Value: 0 - 7 可选
   # 自定义文章「引用部分」的样式
 
@@ -124,7 +124,10 @@ tagcloud: true
 # Blogroll, Link exchange | 友情链接
 # friends: false
 friends:
-  name: http://luuman.github.io/
+  荏苒。: https://www.eyrefree.org/
+  Vincent Yao : http://blog.ookcode.com/
+  树莓派实验室 : http://shumeipai.nxez.com/
+  Leesec's Blog : http://www.leesec.com/
 
 # 打赏
 # 请在需要打赏的文章的md文件头部，设置属性reward: true
