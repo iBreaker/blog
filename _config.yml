@@ -68,6 +68,9 @@ theme: spfk
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
+- type: git
   repo: git@git.coding.net:breaker/blog.git
+  branch: master
+- type: git
+  repo: git@github.com:iBreaker/blog.git
   branch: master
