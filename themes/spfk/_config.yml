@@ -39,9 +39,9 @@ subnav:
   wechat: "#"
   douban: "#"
   pinboard: "#"
-  stackoverflow: "#"
-  Instagram: "#"
-  segmentfault: "#"
+  # stackoverflow: "#"
+  # Instagram: "#"
+  # segmentfault: "#"
 
 # >>> Conments 评论系统 <<<
 # Chose ONE as your comment system and keep others disable.
