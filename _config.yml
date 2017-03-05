@@ -7,7 +7,7 @@ title: Breaker's Blog
 subtitle:  作为意志和表象的世界
 description: 作为意志和表象的世界
 author: Breaker
-language: zh-CN
+language: zh-Hans
 timezone: Asia/Shanghai
 
 # URL
@@ -63,7 +63,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: spfk
+theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
