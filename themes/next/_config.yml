@@ -6,7 +6,7 @@
 favicon: /favicon.ico
 
 # Set default keywords (Use a comma to separate)
-keywords: "Hexo, NexT"
+keywords: "安全, 黑客, linux, 开发, 树莓派, 自制操作系统, vim, Breaker's Blog"
 
 # Set rss to false to disable feed link.
 # Leave rss as empty to use site's feed link.
@@ -28,7 +28,7 @@ copyright: true
 canonical: true
 
 # Change headers hierarchy on site-subtitle (will be main site description) and on all post/pages titles for better SEO-optimization.
-seo: false
+seo: true
 
 # ---------------------------------------------------------------
 # Menu Settings
@@ -134,8 +134,8 @@ font:
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
 social:
   #LinkLabel: Link
-    Github: https://github.com/iBreaker  
-    Coding: https://coding.net/u/breaker
+  GitHub: https://github.com/iBreaker
+  Coding: https://coding.net/u/breaker
 
 # Social Links Icons
 # Icon Mapping:
@@ -147,14 +147,13 @@ social_icons:
   # Icon Mappings.
   # KeyMapsToSocialItemKey: NameOfTheIconFromFontAwesome
   GitHub: github
-  Twitter: twitter
-  Weibo: weibo
+  Coding: code
 
 
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.jpg
 # in site  directory(source/uploads): /uploads/avatar.jpg
-avatar: https://avatars1.githubusercontent.com/u/3455675?v=3&u=0c6a4c13096b14d8b476f068495d4736fb88beef&s=400
+avatar: /images/avatar.jpg
 
 
 # Table Of Contents in the Sidebar
@@ -200,8 +199,8 @@ sidebar:
 
 # Blog rolls
 links_title: Links
-#links_layout: block
-links_layout: inline
+links_layout: block
+#links_layout: inline
 links:
   荏苒。: https://www.eyrefree.org/
   Vincent Yao : http://blog.ookcode.com/
@@ -346,7 +345,7 @@ duoshuo_share: true
 duoshuo_info:
   ua_enable: true
   admin_enable: true
-  user_id: 0
+  user_id: 6391108268680283000
   admin_nickname: Breaker
 
 
@@ -412,7 +411,7 @@ busuanzi_count:
 
 
 # Enable baidu push so that the blog will push the url to baidu automatically which is very helpful for SEO
-baidu_push: false
+baidu_push: true
 
 # Google Calendar
 # Share your recent schedule to others via calendar page
