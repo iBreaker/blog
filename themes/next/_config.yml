@@ -285,7 +285,7 @@ mathjax:
 #swiftype_key:
 
 # Baidu Analytics ID
-#baidu_analytics:
+baidu_analytics: 11fc96af61d8f7a296cb2b9868b79241
 
 # Duoshuo ShortName
 duoshuo_shortname: breaker
