@@ -1,0 +1,870 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="80386,寄存器," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Breaker's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="写这篇文章，完全是因为学习保护模式需要这些知识，读者完全可以走马观花，大致看看有什么内容，知道需要的时候来查这篇文章就可以了，完全没有必要抵抗着困意非要把这篇文章认真看完，">
+<meta name="keywords" content="80386,寄存器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="80386寄存器（转载）">
+<meta property="og:url" content="http://0x7c00.com/2014/80386-register/index.html">
+<meta property="og:site_name" content="Breaker&#39;s Blog">
+<meta property="og:description" content="写这篇文章，完全是因为学习保护模式需要这些知识，读者完全可以走马观花，大致看看有什么内容，知道需要的时候来查这篇文章就可以了，完全没有必要抵抗着困意非要把这篇文章认真看完，">
+<meta property="og:image" content="https://pic.0x7c00.cn/blog/80386-register/1.jpg">
+<meta property="og:image" content="https://pic.0x7c00.cn/blog/80386-register/2.jpg">
+<meta property="og:image" content="https://pic.0x7c00.cn/blog/80386-register/3.jpg">
+<meta property="og:updated_time" content="2017-05-08T17:48:39.567Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="80386寄存器（转载）">
+<meta name="twitter:description" content="写这篇文章，完全是因为学习保护模式需要这些知识，读者完全可以走马观花，大致看看有什么内容，知道需要的时候来查这篇文章就可以了，完全没有必要抵抗着困意非要把这篇文章认真看完，">
+<meta name="twitter:image" content="https://pic.0x7c00.cn/blog/80386-register/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6391108268680283000',
+      author: 'Breaker'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://0x7c00.com/2014/80386-register/"/>
+
+
+
+
+
+  <title> 80386寄存器（转载） | Breaker's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?11fc96af61d8f7a296cb2b9868b79241";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Breaker's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">作为意志和表象的世界</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://0x7c00.com/2014/80386-register/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Breaker">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Breaker's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                80386寄存器（转载）
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2014-11-24T20:00:11+00:00">
+                2014-11-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Operating-System/" itemprop="url" rel="index">
+                    <span itemprop="name">Operating System</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2014/80386-register/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2014/80386-register/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>写这篇文章，完全是因为学习保护模式需要这些知识，读者完全可以走马观花，大致看看有什么内容，知道需要的时候来查这篇文章就可以了，完全没有必要抵抗着困意非要把这篇文章认真看完，<br><a id="more"></a></p>
+<p>记住里面每一个寄存器里每一位的定义，但是以后的文章如果需要，一定要记得回来查查相关的内容。 </p>
+<p>80386共提供7种类型的32位寄存器，如下： </p>
+<ul>
+<li><strong>通用寄存器</strong> (EAX、EBX、ECX、EDX、ESP、EBP、ESI、EDI) </li>
+<li><strong>段寄存器</strong>(CS、SS、DS、ES、FS、GS) </li>
+<li><strong>指令指针寄存器和标志寄存器</strong>(EIP、EFLAGS) </li>
+<li><strong>系统表寄存器</strong>(GDTR、IDTR、LDTR、TR) </li>
+<li><strong>控制寄存器</strong>(CR0、CR1、CR2、CR3、CR4) </li>
+<li><strong>调试寄存器</strong>(DR0、DR1、DR2、DR3、DR4、DR5、DR6、DR7) </li>
+<li><strong>测试寄存器</strong>(TR6、TR7) </li>
+</ul>
+<p>其中后三类寄存器是80386以后的CPU才有的，以前的CPU完全没有。<br>下图是前四类寄存器的大致示意图：<br><img src="https://pic.0x7c00.cn/blog/80386-register/1.jpg" alt="pic-1"><br>本文只对这些寄存器做一个大致的介绍，其中有些特殊且有较大意义的寄存器，会另文介绍。 </p>
+<p>一、通用寄存器<br>一组八个通用寄存器是对8086/80286通用寄存器的32位扩展，其用法与在8086/80286中相似，<br>支持8位、16位、32位操作，进行32位操作是，寄存器名称前面冠以“E”。<br>这八个寄存器的名称如下：<br>EAX（累加器）、EBX（基址）、ECX（计数）、EDX（数据）、ESP（栈指针）、EBP（基址指针）、ESI（源变址）、EDI（目的变址）。 </p>
+<p>二、段寄存器<br>80386比8086/80286增加了两个段寄存器FS、GS。<br>除CS支持代码段，SS支持堆栈段外，程序员可以利用其它的所有段寄存器支持数据段。<br>每个段寄存器对应这一个64位高速缓存器（有些资料中说有96位，但值使用其中的64位），<br>这在8086中是没有的（在80286中为48位），它的具体作用将另文介绍。 </p>
+<p>三、指令指针寄存器和标志寄存器<br>指令寄存器EIP是对8086/80286指令指针寄存器的32位扩展，它包含着待执行指令的32位偏移量，<br>该值总是相对CS所代表的段基址而言的。 标志寄存器也是对8086/80286标志寄存器的32位扩展，<br>其定义如下（这张图截自Intel关于IA32架构的最新文档）：<br><img src="https://pic.0x7c00.cn/blog/80386-register/2.jpg" alt="pic-1"><br>其中OF、DF、IF、TF、SF、ZF、AF、PF和CF在8086中就已经存在，<br>请参考相关资料。 IOPL（I/O Privilege Level）是从80286开始出现的，占2个bit表示I/O特权级，<br>如果当前特权级小于或等于IOPL，则可以执行I/O操作，否则将出现一个保护性异常。<br>IOPL只能由特权级为0的程序或任务来修改。<br>NT（Nested Task）也是从80286开始出现的，表示嵌套任务，用于控制中断返回指令IRET，当NT=0时，<br>用堆栈中保存的值恢复EFLAGS、CS和EIP，从而实现返回；若NT=1，则通过任务切换实现中断返回。<br>下面的标志位是80386以后的CPU才有的标志。 VM（Virtual-8086 mode）表示虚拟8086模式，<br>如果VM被置位且80386已出于保护模式下，则CPU切换到虚拟8086模式，此时，对段的任何操作又回到了实模式，<br>如同在8086下运行一样。 RF（Resume flag）表示恢复标志(也叫重启标志)，与调试寄存器一起用于断点和单步操作，<br>当RF＝1 时，下一条指令的任何调试故障将被忽略，不产生异常中断。当RF=0时，调试故障被接受，并产生异常中断。<br>用于调试失败后，强迫程序恢复执行，在成功执行每条指令后，RF自动复位。 AC（Alignment check）表示对齐检查。<br>这个标志是80486以后的CPU才有的。当AC=1且CR0中的AM=1时，允许存储器进行地址对齐检查，若发现地址未对齐，<br>将产生异常中断。所谓地址对齐，是指当访问一个字（2字节长）时，其地址必须是偶数（2的倍数），当访问双字（4字节长）时，<br>其地址必须是4的倍数。 但是只有运行在特权级3的程序才执行地址对齐检查，特权级0、1、2忽略该标志。<br>VIF（Virtual interrupt flag）表示虚拟中断标志。以下的三个标志是Pentium以后的CPU才有的。<br>当VIF=1时，可以使用虚拟中断，当VIF=0时不能使用虚拟中断。该标志要和下面的VIP和CR4中的VME配合使用。<br>VIP（Virtual interrupt pending flag）表示虚拟中断挂起标志。当VIP=1时，VIF有效，VIP=0时VIF无效。<br>ID（Identification flag）表示鉴别标志。该标志用来只是Pentium CPU是否支持CPUID的指令。<br>实际上，如果不编写操作系统，大部分标志可能很难得用到一次，有个印象就好了，用到了再去查不迟。 </p>
+<p>四、系统表寄存器<br>80386 中有4个系统表寄存器，分别是</p>
+<ul>
+<li>全局描述符表寄存器(GDTR)</li>
+<li>中断描述符表寄存器(IDTR)</li>
+<li>局部描述符表寄存器(LDTR)</li>
+<li>任务状态寄存器(TR)<br>系统表寄存器用于在保护方式下，管理4 个系统表，由于只能在保护方式下使用，因此又称为保护方式寄存器。<br>有关描述附表的问题，另文介绍。 </li>
+</ul>
+<p>五、控制寄存器<br>80386的控制寄存器有4个,其中CR1保留以后使用，从Pentium开始，又增加了一个CR4，<br>CR0的低16位包含了与80286的MSW一致的位定义，保持了和80286的兼容，同时也兼容了从80286开始的两条指令LMSW/SMSW，<br>其基本定义如下： CR0中各位含义如下： PE（Protection Enable）保护模式允许，PE=0表示CPU工作在实模式，<br>PE=1表示CPU工作在保护模式 MP（Monitor Coprocessor）监控协处理器，MP=1表示协处理器在工作，MP=0表示协处理器未工作。<br>EM（Emulation）协处理器仿真，当MP=0，EM=1时，表示正在使用软件仿真协处理器工作。 TS（Task Switched）任务转换，<br>每当进行任务转换时，TS=1，任务转换完毕，TS=0。TS=1时不允许协处理器工作。 以上4个定义从80286开始，<br>下面的2个定义从80386开始存在 ET（Extension Type）处理器扩展类型，反映了所扩展的协处理器的类型，<br>ET=0为80287，ET=1为80387。 PG（Paging）页式管理机制使能，PG=1时页式管理机制工作，否则不工作。<br>从80486开始又增加了如下位定义。 NE（Numeric Error）数值异常中断控制，NE=1时，如果运行协处理器指令发生故障，<br>则用异常中断处理，NE=0时，则用外部中断处理。 WP（Write Protect）写保护，当WP=1时，对只读页面进行写操作会产生页故障。<br>AM（Alignment Mask）对齐标志，AM=1时，允许对齐检查，AM=0时不允许，关于对齐，在EFLAGS的AC标志时介绍过，在80486以后的CPU中，<br>CPU进行对齐检查需要满足三个条件，AC=1、AM=1并且当前特权级为3。 NW（Not Write-through）和CD（Cache Disable），<br>这两个标志都是用来控制CPU内部的CACHE的，当NW=0且CD=0时，CACHE使能，其它的组合说起来比较复杂，如果有读者真的想搞清楚的话，<br>可以参阅《Intel? 64 and IA-32 Architectures》中的“Software Developer’s Manual Volume 3A”这一册，<br>在第10章对这两个标志的各种组合有比较详细的说明。 CR1保留未用；CR2存放引起页故障的线性地址，只有在PG=1时，<br>CR2才有效，当页故障处理程序被激活时，压入页故障处理程序堆栈中的错误码提供页故障的状态信息。<br>CR3的bit12–bit31存放页目录的基地址，因为也目录总是页对齐的（一页为4K），所以页目录基地址从bit12开始就可以了。<br>只有当CR0中的PG=1时，CR3的页目录基地址才有效。 从80486开始，在CR3的低12位定义了两个控制位，如下：<br><img src="https://pic.0x7c00.cn/blog/80386-register/3.jpg" alt="pic-3"><br>PCD（Page-level Cache Disable）页CACHE禁止，当PCD=0时，页目录表进行高速缓存，PCD=1时，不进行高速缓存；<br>该位控制PCD引脚控制外部CACHE工作还是不工作。 PWT（Page-level Writes Transparent），CACHE的写入分为透写<br>（Write-Through）和回写（Write-Back）,80486以上的CPU内部的CACHE都是透写的，但对外部CACHE而言，允许某些页是回写的，<br>而另一些页是透写的，当PWT=1时，外部CACHE对页目录进行透写，否则进行回写；此位驱动PWT引脚以控制外部CACHE是透写还是回写。<br>CR4是从Pentium CPU开始出现的。 VME（Virtual-8086 Mode Extensions）虚拟8086方式扩展，VME=1允许使用虚拟8086扩展模式，<br>否则只能使用80386/80486的虚拟8086模式。 PVI（Protected-Mode Virtual Interrupts）保护模式虚拟中断，PVI=1时，<br>在保护模式下支持虚拟中断标志VIF(EFLAGS中)，PVI=0则不支持虚拟中断标志。 TSD（Time Stamp Disable）时间戳禁止，TSD=1时，<br>允许在特权级为0的程序中执行RDTSC指令（读时间戳计数指令），TSD=0时，允许任何特权级执行RDTSC指令。 DE（Debugging Extensions）<br>调试扩展， PSE（Page Size Extensions）页大小扩展，PSE=1时，页大小可以扩展到2M或4M，PSE=0时，页大小只能是4K.<br>PAE（Physical Address Extension）物理地址扩展，PAE=1时，页物理地址可以扩展到36bits以上，PAE=0时只能用32bits的物理地址。<br>MCE（Machine-Check Enable）硬件检查使能，Pentium以后的CPU有一种硬件检测功能，MCE=1时允许使用该功能。<br>PGE（Page Global Enable）全局页使能，PGE=1时，允许使用全局页，PGE=0时禁止使用全局页。 PCE（Performance-Monitoring Counter Enable）<br>性能监视计数器使能，当PCE=1时，允许在任何保护级下执行RDPMC指令，PCE=0时，只有特权级0的程序可以执行RDPMC指令。<br>OSFXSR（Operating System Support for FXSAVE and FXRSTOR instructions）<br>OSXMMEXCPT（Operating System Support for Unmasked SIMD Floating-Point Exceptions）<br>VMXE（VMX-Enable Bit）VMX使能位，VMXE=1时，允许VMX操作。<br>SMXE（SMX-Enable Bit）SMX使能位，SMXE=1时，允许SMX操作。<br>OSXSAVE（XSAVE and Processor Extended States-Enable Bit） </p>
+<p>六、调试寄存器<br>一共有8个调试寄存器DR0–DR7，DR0-DR3可以分别设置4个断点的线性地址，DR4-DR5保留未用，DR6是断点状态寄存器，<br>DR7是断点控制寄存器（包括断点类型、断点长度，断点开放/禁止） 七、测试寄存器 一共有8个测试寄存器TR0–TR7，<br>TR0-TR2保留，TR3-TR5用作CACHE测试，TR6为命令测试寄存器，TR7为测试数据寄存器。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/80386/" rel="tag"># 80386</a>
+          
+            <a href="/tags/寄存器/" rel="tag"># 寄存器</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/M1-card-crack/" rel="next" title="热水卡破解">
+                <i class="fa fa-chevron-left"></i> 热水卡破解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/ps2-mouse/" rel="prev" title="PS2鼠标中断信号的处理">
+                PS2鼠标中断信号的处理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2014/80386-register/"
+     data-title="80386寄存器（转载）"
+     data-content=""
+     data-url="http://0x7c00.com/2014/80386-register/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2014/80386-register/"
+           data-title="80386寄存器（转载）" data-url="http://0x7c00.com/2014/80386-register/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Breaker" />
+          <p class="site-author-name" itemprop="name">Breaker</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/iBreaker" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/breaker" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-code"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.eyrefree.org/" title="荏苒。" target="_blank">荏苒。</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://blog.ookcode.com/" title="Vincent Yao" target="_blank">Vincent Yao</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shumeipai.nxez.com/" title="树莓派实验室" target="_blank">树莓派实验室</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.leesec.com/" title="Leesec's Blog" target="_blank">Leesec's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2012 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Breaker</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"breaker"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js?v=5.1.0"></script>
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

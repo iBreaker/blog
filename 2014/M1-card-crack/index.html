@@ -1,0 +1,1220 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="122U,Mifare1,RFID,热水卡,破解," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Breaker's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="今天遇到点烦心事，只看了GDT（Global Descriptor Table）相关的内容，没有继续完成操作系统的引导部分。不过晚上热水卡没有钱了，刚好今天OS没有大的进展，顿时萌生了“自力更生，丰衣足食”的良好念头 :-)   。">
+<meta name="keywords" content="122U,Mifare1,RFID,热水卡,破解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="热水卡破解">
+<meta property="og:url" content="http://0x7c00.com/2014/M1-card-crack/index.html">
+<meta property="og:site_name" content="Breaker&#39;s Blog">
+<meta property="og:description" content="今天遇到点烦心事，只看了GDT（Global Descriptor Table）相关的内容，没有继续完成操作系统的引导部分。不过晚上热水卡没有钱了，刚好今天OS没有大的进展，顿时萌生了“自力更生，丰衣足食”的良好念头 :-)   。">
+<meta property="og:image" content="http://ccwyy.img43.wal8.com/img43/507648_20150116191603/14217545389.png">
+<meta property="og:updated_time" content="2017-05-08T17:19:24.599Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="热水卡破解">
+<meta name="twitter:description" content="今天遇到点烦心事，只看了GDT（Global Descriptor Table）相关的内容，没有继续完成操作系统的引导部分。不过晚上热水卡没有钱了，刚好今天OS没有大的进展，顿时萌生了“自力更生，丰衣足食”的良好念头 :-)   。">
+<meta name="twitter:image" content="http://ccwyy.img43.wal8.com/img43/507648_20150116191603/14217545389.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6391108268680283000',
+      author: 'Breaker'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://0x7c00.com/2014/M1-card-crack/"/>
+
+
+
+
+
+  <title> 热水卡破解 | Breaker's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?11fc96af61d8f7a296cb2b9868b79241";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Breaker's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">作为意志和表象的世界</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://0x7c00.com/2014/M1-card-crack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Breaker">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Breaker's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                热水卡破解
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2014-11-22T05:18:36+00:00">
+                2014-11-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hacking/" itemprop="url" rel="index">
+                    <span itemprop="name">Hacking</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2014/M1-card-crack/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2014/M1-card-crack/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>今天遇到点烦心事，只看了GDT（Global Descriptor Table）相关的内容，没有继续完成操作系统的引导部分。不过晚上热水卡没有钱了，刚好今天OS没有大的进展，顿时萌生了“自力更生，丰衣足食”的良好念头 :-)   。</p>
+<a id="more"></a>
+<p>M1卡，全程NXP Mifare1 卡。现在日常接触到的大部分都是M1卡。学校的所有卡，包括公交卡、甚至学校饭卡。</p>
+<p><strong>  0X00  先从M1卡的结构说起吧</strong></p>
+<ul>
+<li>存储结构</li>
+<li><p>M1卡分为16个扇区，每个扇区由4块（块0、块1、块2、块3）组成，（我们也将16个扇区的64个块按绝对地址编号为0~63，存贮结构如下图所示：</p>
+<table><br><tbody><br><tr><br><td width="60"></td><br><td width="48"></td><br><td width="204"></td><br><td width="72"></td><br><td width="48"></td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块0</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">0</td><br></tr><br><tr><br><td width="60">扇区0</td><br><td width="48">块1</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">1</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块2</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">2</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块3</td><br><td width="204">密码A   存取控制   密码B</td><br><td width="72">控制块</td><br><td width="48">3</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块0</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">4</td><br></tr><br><tr><br><td width="60">扇区1</td><br><td width="48">块1</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">5</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块2</td><br><td width="204"></td><br><td width="72">数据块</td><br><td width="48">6</td><br></tr><br><tr><br><td width="60"></td><br><td width="48">块3</td><br><td width="204">密码A   存取控制   密码B</td><br><td width="72">控制块</td><br><td width="48">7</td><br></tr><br><tr><br><td width="60"></td><br><td width="48"> 一直到15</td><br><td width="204"></td><br><td width="72"></td><br><td width="48"></td><br></tr><br></tbody><br></table>
+</li>
+<li><p>第0扇区的块0（即绝对地址0块），它用于存放厂商代码，已经固化，不可更改。</p>
+</li>
+<li><p>每个扇区的块0、块1、块2为<strong>数据块</strong>，可用于存贮数据。<br><strong>数据块</strong>可作两种应用：</p>
+</li>
+<li><p>用作一般的数据保存，可以进行<strong>读</strong>、<strong>写</strong>操作。</p>
+</li>
+<li>用作数据值，可以进行<strong>初始化值、加值、减值、读值</strong>操作。</li>
+<li>每个扇区的块3为<strong>控制块</strong>，包括了密码A、存取控制、密码B。具体结构如下：<br><table><br><tbody><br><tr><br><td width="402"><br><table width="100%"><br><tbody><br><tr><br><td>A0 A1 A2 A3 A4 A5   FF 07 80 69     B0 B1 B2 B3 B4 B5</td><br></tr><br></tbody><br></table><br></td><br></tr><br></tbody><br></table><br>密码A（6字节）  存取控制（4字节） 密码B（6字节）</li>
+</ul>
+<p>每个扇区的密码和存取控制都是独立的，可以根据实际需要设定各自的密码及存取控制。存取控制为4个字节，共32位，扇区中的每个块（包括数据块和控制块）的存取条件是由密码和存取控制共同决定的，在<strong>存取控制</strong>中每个块都有相应的<strong>三个控制位</strong>,定义如下：</p>
+<p>块0：   C10   C20   C30</p>
+<p>块1：   C11   C21   C31</p>
+<p>块2：   C12   C22   C32</p>
+<p>块3：   C13   C23   C33</p>
+<p>三个控制位以正和反两种形式存在于存取控制字节中，决定了该块的访问权限（如</p>
+<p>进行减值操作必须验证KEY A，进行加值操作必须验证KEY B，等等）。三个控制</p>
+<p>位在存取控制字节中的位置，以块0为例：</p>
+<p>&nbsp;</p>
+<p>对块0的控制：</p>
+<p>bit  7    6     5       4     3      2      1      0</p>
+<p><table></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td width="72">字节6</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C20_b</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C10_b</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节7</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C10</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C30_b</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节8</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C30</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48">C20</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节9</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td><br><br><br><br>( 注： C10_b表示C10取反 )</p>
+<p>&nbsp;</p>
+<p>存取控制（4字节，其中字节9为备用字节）结构如下所示：</p>
+<p>bit  7    6      5       4     3      2      1      0</p>
+<p><table></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td width="72">字节6</td></p>
+<p><td width="48">C23_b</td></p>
+<p><td width="48">C22_b</td></p>
+<p><td width="48">C21_b</td></p>
+<p><td width="48">C20_b</td></p>
+<p><td width="48">C13_b</td></p>
+<p><td width="48">C12_b</td></p>
+<p><td width="48">C11_b</td></p>
+<p><td width="48">C10_b</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节7</td></p>
+<p><td width="48">C13</td></p>
+<p><td width="48">C12</td></p>
+<p><td width="48">C11</td></p>
+<p><td width="48">C10</td></p>
+<p><td width="48">C33_b</td></p>
+<p><td width="48">C32_b</td></p>
+<p><td width="48">C31_b</td></p>
+<p><td width="48">C30_b</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节8</td></p>
+<p><td width="48">C33</td></p>
+<p><td width="48">C32</td></p>
+<p><td width="48">C31</td></p>
+<p><td width="48">C30</td></p>
+<p><td width="48">C23</td></p>
+<p><td width="48">C22</td></p>
+<p><td width="48">C21</td></p>
+<p><td width="48">C20</td><br></p>
+<p><tr></tr></p>
+<p><td width="72">字节9</td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td><br><br><br><br>( 注： _b表示取反 )</p>
+<p>&nbsp;</p>
+<p>6、<strong>数据块</strong>（块0、块1、块2）的存取控制如下：</p>
+<p>&nbsp;</p>
+<p><table></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td colspan="3" width="144">  控制位（X=0..2）</td></p>
+<p><td colspan="4" width="312">         访 问 条 件 （对数据块 0、1、2）</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">C1X</td></p>
+<p><td width="48">C2X</td></p>
+<p><td width="48">C3X</td></p>
+<p><td width="60"> Read</td></p>
+<p><td width="60"> Write</td></p>
+<p><td width="72">Increment</td></p>
+<p><td width="120">Decrement, transfer,Restore</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="72">KeyA|B</td></p>
+<p><td width="120">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="72">KeyB</td></p>
+<p><td width="120">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="72">Never</td></p>
+<p><td width="120">Never</td><br><br><br><br>（KeyA|B 表示密码A或密码B，Never表示任何条件下不能实现）</p>
+<p>&nbsp;</p>
+<p>例如：当块0的存取控制位C10 C20 C30=1 0 0时，验证密码A或密码B正确后可读；</p>
+<p>验证密码B正确后可写；不能进行加值、减值操作。</p>
+<p>&nbsp;</p>
+<p>7、<strong>控制块</strong>块3的存取控制与<strong>数据块</strong>（块0、1、2）不同，它的存取控制如下：</p>
+<p>&nbsp;</p>
+<p><table></table></p>
+<p><tbody></tbody></p>
+<p><tr></tr></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td width="48"></td></p>
+<p><td colspan="2" width="120"><strong>密码A</strong></td></p>
+<p><td colspan="2" width="120"><strong>存取控制</strong></td></p>
+<p><td colspan="2" width="120"><strong>密码B</strong></td><br></p>
+<p><tr></tr></p>
+<p><td width="48">C13</td></p>
+<p><td width="48">C23</td></p>
+<p><td width="48">C33</td></p>
+<p><td width="60">Read</td></p>
+<p><td width="60">Write</td></p>
+<p><td width="60">Read</td></p>
+<p><td width="60">Write</td></p>
+<p><td width="60">Read</td></p>
+<p><td width="60">Write</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyB</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyA|B</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyB</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">0</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">KeyB</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td><br></p>
+<p><tr></tr></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="48">1</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">KeyA|B</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td></p>
+<p><td width="60">Never</td><br><br><br><br>例如：当块3的存取控制位C13 C23 C33=1 0 0时，表示：</p>
+<p>密码A：不可读，验证KEYA或KEYB正确后，可写（更改）。</p>
+<p>存取控制：验证KEYA或KEYB正确后，可读、可写。</p>
+<p>密码B：验证KEYA或KEYB正确后，可读、可写。</p>
+<p>知道这些东西已经足够了，就看怎么利用了。</p>
+<p><strong>0x01 破解key，读取数据</strong></p>
+<p>大多数卡中的数据除了第一扇区记录卡的信息外，剩下的15个扇区只有一个扇区记录金额和校验信息。剩下的扇区都是空数据。keyA keyB都是默认的。关于破解的算法08年国外已经有人公布 。运气好的话用Mifare Classic Offline Cracker就可以读到卡中16个扇区的数据。</p>
+<p><img src="http://ccwyy.img43.wal8.com/img43/507648_20150116191603/14217545389.png" alt=""></p>
+<p>但读到数据只是第一步，还需要知道那里存的是金额哪里是校验位，以及校验算法</p>
+<p><strong>0x02  破解校验算法</strong></p>
+<p>现在只看金额和校验数据的8个字节，通过两张卡都刷了两次得到以下数据</p>
+<p>卡A</p>
+<p>01  14   03  20  03  bd    a8   f1          金额 957</p>
+<p>01  14  03  20  03   bc    a9   f1          金额 956</p>
+<p>卡B</p>
+<p>01  14  03  20  20   40   56   f1           金额 64</p>
+<p>01  14  03  20  20    3f    29   f1           金额 63</p>
+<p>这里需要对十六进制数据比较敏感。 0x03BD 两个字节就是 957    0x03bc是 956</p>
+<hr>
+<p>2014年12月7日10:19:27</p>
+<ul>
+<li>上次的工作只进行了一半，只知道了保存金额的位置。那就是0x384  0x285 这两个地址的数值。而且还是大端模式的存储。再来分析下。<br>01  14   03  20  03  bd    a8   f1</li>
+</ul>
+<p>01  14  03  20  03   bc    a9   f1</p>
+<p>01  14  03  20  20   40   56   f1</p>
+<p>01  14  03  20  20    3f    29   f1</p>
+<ul>
+<li>似乎前四个字节和最后一个字节的数值不变。那么现在只有一个字节的数据定义不清楚了。 这就是传说中的校验数据。这一字节的数据验证金额是否合法。不合法的话就算前面两个字节再大，也会不认得。 那么怎么破解校验呢。<br>03  bd    a8                03   bc    a9               20   40   56                20    3f    29</li>
+</ul>
+<p>这三次的校验字节分别是 0xa8  0xa9  0x56   0x29 这和前面两个字节的数据有什么关系！！  还是看不出来 。还是采集的数据太少了，我再找几张卡去。</p>
+<p>A 、B、C、D张卡共刷了50次左右的数据</p>
+<p>//卡A   +1<br>01 14 03 20 03 bd a8 f1<br>01 14 03 20 03 bc a9 f1</p>
+<p>01 14 03 20 01 d4 c3 f1<br>01 14 03 20 01 d3 c4 f1<br>01 14 03 20 01 d2 c5 f1<br>01 14 03 20 01 d1 c6 f1<br>01 14 03 20 01 d0 c7 f1<br>01 14 03 20 01 cf d8 f1<br>01 14 03 20 01 ce d9 f1</p>
+<p>01 14 03 20 01 ba ad f1<br>01 14 03 20 01 b9 ae f1<br>01 14 03 20 01 b8 af f1</p>
+<p>//卡B   +3-1+3-1+3-1<br>01 14 03 20 20 40 56 f1</p>
+<p>01 14 03 20 20 3f 29 f1<br>01 14 03 20 20 3e 28 f1<br>01 14 03 20 20 3d 2b f1<br>01 14 03 20 20 3c 2a f1<br>01 14 03 20 20 3b 2d f1<br>01 14 03 20 20 3a 2c f1<br>01 14 03 20 20 39 2f f1</p>
+<p>01 14 03 20 20 1c 0a f1<br>01 14 03 20 20 1b 0d f1<br>01 14 03 20 20 1a 0c f1</p>
+<p>//卡C    +3-1-5-1+3-1-5-1+3<br>01 14 03 20 04 b6 a4 f1<br>01 14 03 20 04 b5 a7 f1<br>01 14 03 20 04 b4 a6 f1<br>01 14 03 20 04 b3 a1 f1<br>01 14 03 20 04 b2 a0 f1<br>01 14 03 20 04 b1 a3 f1<br>01 14 03 20 04 b0 a2 f1<br>01 14 03 20 04 af bd f1<br>01 14 03 20 04 ae bc f1<br>01 14 03 20 04 ad bf f1</p>
+<p>//卡D     -1+3-1+3<br>01 14 03 20 09 8f 90 f1</p>
+<p>01 14 03 20 08 5d 43 f1<br>01 14 03 20 08 5c 42 f1<br>01 14 03 20 08 5b 45 f1<br>01 14 03 20 08 5a 44 f1<br>01 14 03 20 08 59 47 f1</p>
+<p>01 14 03 20 08 3a 24 f1<br>01 14 03 20 08 39 27 f1</p>
+<p>01 14 03 20 08 38 26 f1</p>
+<ul>
+<li>看了几个小时，找到了规律。红色部分 3 -&gt;2   1-&gt;0 。 再看看其他的数据，都符合这个规律。0&lt;-&gt;1,2&lt;-&gt;3,4&lt;-&gt;5 …… E&lt;-&gt;F。<br>&nbsp;</li>
+</ul>
+<p>好了，校验字节的高四位已经明了。只剩下低四位了。 又看了几个小时，找到了最后一个字母的规律。结果是每张卡的校验算法都是不一样的。</p>
+<ul>
+<li>卡A<br>//卡A   +1</li>
+</ul>
+<p>01 14 03 20 01 d4 c3 f1<br>01 14 03 20 01 d3 c4 f1<br>01 14 03 20 01 d2 c5 f1<br>01 14 03 20 01 d1 c6 f1<br>01 14 03 20 01 d0 c7 f1<br>01 14 03 20 01 cf d8 f1<br>01 14 03 20 01 ce d9 f1</p>
+<p>当金额每次减一 即01 d4、01 d3、 01 d1 、01 d0、 01 cf、01 ce   校验字节的低四位分别是 3、4、5、6、7、8、9</p>
+<ul>
+<li>卡B<br>01 14 03 20 20 3f 29 f1<br>01 14 03 20 20 3e 28 f1<br>01 14 03 20 20 3d 2b f1<br>01 14 03 20 20 3c 2a f1<br>01 14 03 20 20 3b 2d f1<br>01 14 03 20 20 3a 2c f1<br>01 14 03 20 20 39 2f f1</li>
+</ul>
+<p>当金额每次减一，校验字节的低四位分别是 9、8、b、a、d、c、f       规律 ：+3-1+3-1+3-1………..</p>
+<ul>
+<li>卡C<br>01 14 03 20 04 b6 a4 f1<br>01 14 03 20 04 b5 a7 f1<br>01 14 03 20 04 b4 a6 f1<br>01 14 03 20 04 b3 a1 f1<br>01 14 03 20 04 b2 a0 f1<br>01 14 03 20 04 b1 a3 f1<br>01 14 03 20 04 b0 a2 f1<br>01 14 03 20 04 af bd f1<br>01 14 03 20 04 ae bc f1<br>01 14 03 20 04 ad bf f1</li>
+</ul>
+<p>规律 ：+3-1-5-1+3-1-5-1+3 ………..</p>
+<ul>
+<li>卡D<br>01 14 03 20 08 5d 43 f1<br>01 14 03 20 08 5c 42 f1<br>01 14 03 20 08 5b 45 f1<br>01 14 03 20 08 5a 44 f1<br>01 14 03 20 08 59 47 f1</li>
+</ul>
+<p>规律 ：-1+3-1+3 ………..</p>
+<p>为什吗只有B和D的校验算法是一样的！！！百思不得其解 ;-(      想了想应该有下面两个原因</p>
+<ol>
+<li>校验结果很有可能和每张卡的ID有关，每张卡的ID在第0扇区存着，按照规定是不能改的。</li>
+<li><del>校验结果和0x384 处的的值有关。 </del>想想还是不可能，因为在0x384 值不变的情况下 0x386 第四位的值已经变了。<br><strong>  0X03 总结</strong></li>
+</ol>
+<p>现在已经可以改写卡的数据了，改完之后计算出相应的校验字节，写入0x386就可以。麻烦的是没有一个统一的算法算。只能先把每张卡的规律找出来。我觉得肯定有统一的算法，只是我没有总结出来而已。要分析清楚，需要采集大量的数据，没那个时间。反正目达到就好。有兴趣的同学还可以继续研究，比如说你的洗澡卡，洗衣卡，矿泉水卡，公交卡、、、</p>
+<p>写入数据的时候需要keyA 或 keyB  。 就这样。</p>
+<p>我可是好人，没有做坏事。为了免去不必要的麻烦，还是毕业之后在公布 吧 。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/122U/" rel="tag"># 122U</a>
+          
+            <a href="/tags/Mifare1/" rel="tag"># Mifare1</a>
+          
+            <a href="/tags/RFID/" rel="tag"># RFID</a>
+          
+            <a href="/tags/热水卡/" rel="tag"># 热水卡</a>
+          
+            <a href="/tags/破解/" rel="tag"># 破解</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/hello-world-2-2-2/" rel="next" title="Bochs">
+                <i class="fa fa-chevron-left"></i> Bochs
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/80386-register/" rel="prev" title="80386寄存器（转载）">
+                80386寄存器（转载） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2014/M1-card-crack/"
+     data-title="热水卡破解"
+     data-content=""
+     data-url="http://0x7c00.com/2014/M1-card-crack/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2014/M1-card-crack/"
+           data-title="热水卡破解" data-url="http://0x7c00.com/2014/M1-card-crack/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Breaker" />
+          <p class="site-author-name" itemprop="name">Breaker</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/iBreaker" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/breaker" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-code"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.eyrefree.org/" title="荏苒。" target="_blank">荏苒。</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://blog.ookcode.com/" title="Vincent Yao" target="_blank">Vincent Yao</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shumeipai.nxez.com/" title="树莓派实验室" target="_blank">树莓派实验室</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.leesec.com/" title="Leesec's Blog" target="_blank">Leesec's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2012 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Breaker</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"breaker"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js?v=5.1.0"></script>
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

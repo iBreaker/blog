@@ -1,0 +1,934 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="unix,program,network,linux," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Breaker's Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="unix网络编程知识总结">
+<meta name="keywords" content="unix,program,network,linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UNIX网络编程">
+<meta property="og:url" content="http://0x7c00.com/2017/UNIX-Network-program/index.html">
+<meta property="og:site_name" content="Breaker&#39;s Blog">
+<meta property="og:description" content="unix网络编程知识总结">
+<meta property="og:updated_time" content="2017-05-08T17:19:24.599Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="UNIX网络编程">
+<meta name="twitter:description" content="unix网络编程知识总结">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '6391108268680283000',
+      author: 'Breaker'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://0x7c00.com/2017/UNIX-Network-program/"/>
+
+
+
+
+
+  <title> UNIX网络编程 | Breaker's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?11fc96af61d8f7a296cb2b9868b79241";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Breaker's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">作为意志和表象的世界</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://0x7c00.com/2017/UNIX-Network-program/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Breaker">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Breaker's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                UNIX网络编程
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-15T18:17:12+00:00">
+                2017-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/UNIX-Network-program/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/UNIX-Network-program/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>unix网络编程知识总结</p>
+<a id="more"></a>
+<h2 id="socket编程简介"><a href="#socket编程简介" class="headerlink" title="socket编程简介"></a>socket编程简介</h2><h3 id="套接字地址结构"><a href="#套接字地址结构" class="headerlink" title="套接字地址结构"></a>套接字地址结构</h3><p><strong>POSIX通用数据类型</strong><br>数据类型|说明|头文件<br>–|–|–<br>int8_t | 带符号的8位整数| <code>&lt;sys/types.&gt;</code><br>uint8_t | 无符号的8位整数 | <code>&lt;sys/types.h&gt;</code><br>int16_t | 带符号的16位整数| <code>&lt;sys/types.h&gt;</code><br>uint16_t | 无符号的16位整数 | <code>&lt;sys/types.h&gt;</code><br>int32_t | 带符号的32位整数| <code>&lt;sys/types.h&gt;</code><br>uint32_t | 无符号的32位整数 | <code>&lt;sys/types.h&gt;</code><br>sa_family_t|套接字地址结构的地址组|<code>&lt;sys/socket.h&gt;</code><br>socklen_t|套接字地址长度的结构，一般为<code>uint32_t</code>|<code>&lt;sys/socket.h&gt;</code><br>in_addr_t|IPv4地址，一般为<code>uint32_t</code>|<code>&lt;netinet/in.h&gt;</code><br>in_port_t|端口号，一般为<code>uint16_t</code>|<code>&lt;netinet/in.h&gt;</code></p>
+<p><strong>IPv4网际套接字地址结构<code>重点</code></strong><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">in_addr_t</span> saddr;           <span class="comment">/* 32-bit IPV4 addr */</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">uint8_t</span> sin_len;            <span class="comment">/* struct len(16) */</span></div><div class="line">	<span class="keyword">sa_family_t</span> sin_family;     <span class="comment">/* AF_INET */</span></div><div class="line">	<span class="keyword">in_port_t</span> sin_port;        <span class="comment">/* 16-bit port num */</span></div><div class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span>    <span class="comment">/* 32bit-IPV4 addr */</span></div><div class="line">	<span class="keyword">char</span> sin_zero[<span class="number">8</span>];           <span class="comment">/* unused */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>常用操作<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">addr</span>;</span></div><div class="line">bzero(&amp;addr, <span class="keyword">sizeof</span>(addr));</div><div class="line">addr.sin_family = AF_INET;</div><div class="line">addr.sin_addr.s_addr = htonl(<span class="string">"0.0.0.0"</span>);</div><div class="line">addr.sin_port = htons(<span class="number">1</span>);</div></pre></td></tr></table></figure></p>
+<ul>
+<li>sin_len 并不是所有的结构体都支持这个字段。即使有该字段，我们也无需设置他。</li>
+<li>POSIX规范只需要结构中的三个字段:sin_family、sin_addr和sin_port三个字段。起他额外字段都是可以接受的。</li>
+<li>几乎所有实现都增加了sin_zero字段</li>
+<li>in_port_t和in_addr_t都是以网络字序存储的(大端存储)。</li>
+<li><p>32bit IPv4地址有两种访问方式，既<code>struct in_addr</code> 类型或<code>in_addr_t</code>类型。</p>
+<blockquote>
+<p>sin_addr并不是一个uint32类型的整数而是一个in_addr类型的结构体是有一定历史原因的。在早期的时候，struct in_addr被定义为多种结构的联合体。允许访问32bit中的任意4个字节，或者任意两个16bit的值。这些结构在地址被划分为A类B类C类的时候便于方便的获取适当的字节。而随着子网划分和无类子网的编排，各种地址类正在消失、那个联合体已经不在需要了。</p>
+</blockquote>
+</li>
+<li><p>套接字结构总是用在给定的主机中，虽然有些字段用来进行主机间通讯。</p>
+</li>
+</ul>
+<p><strong>通用套接字</strong><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">uint8_t</span> sa_len;</div><div class="line">    <span class="keyword">sa_family_t</span> sa_family;</div><div class="line">    <span class="keyword">char</span> sa_data[<span class="number">14</span>];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>所有的套接字函数的套接字地址参数的类型是固定的，想要传入不同类型的套接字结构体指针，按照现在的思路可以强制转换成<code>void *</code>类型。但是这种格式是ASC C规定的，在82年的时候还不能使用这样的方式。所以引入了一个通用套接字结构。通用套接字结构完全是为了满足套接字函数可以传入不同类型的套接字结构体指针而设计的。</p>
+<p>所有的linux提供的套接字函数调用的时候都必须强制转换成通用套接字。</p>
+<p>IPv6<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure></p>
+<p><strong>新的通用套接字</strong><br>不像<code>struct sockaddr</code>，新的<code>struct sockaddr_storage</code>足以容纳系统锁支持的任何套接字地址结构。<code>struct sockaddr_storage</code>结构定义在<code>&lt;netinet/in.h&gt;</code>中<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_stroage</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">uint8_t</span> len;</div><div class="line">    <span class="keyword">sa_family_t</span> sin_family;</div><div class="line">    <span class="comment">/*</span></div><div class="line">        </div><div class="line">    */</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="主机字序和网络字序"><a href="#主机字序和网络字序" class="headerlink" title="主机字序和网络字序"></a>主机字序和网络字序</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></div><div class="line"><span class="keyword">uint32_t</span> htonl(<span class="keyword">uint32_t</span> hostlong);	<span class="comment">//32bit 主机地址转网络地址</span></div><div class="line"><span class="keyword">uint16_t</span> htons(<span class="keyword">uint16_t</span> hostshort);	<span class="comment">//16bit 主机地址转网络地址</span></div><div class="line"><span class="keyword">uint32_t</span> ntohl(<span class="keyword">uint32_t</span> hostlong);	<span class="comment">//32bit 网络地址转主机地址</span></div><div class="line"><span class="keyword">uint16_t</span> ntohs(<span class="keyword">uint16_t</span> hostshort);	<span class="comment">//16bit 网络地址转主机地址</span></div></pre></td></tr></table></figure>
+<h3 id="字节操作函数"><a href="#字节操作函数" class="headerlink" title="字节操作函数"></a>字节操作函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">bzero</span><span class="params">(<span class="keyword">void</span> * dest, <span class="keyword">size_t</span> bbytes)</span></span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">bcopy</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> * src, <span class="keyword">void</span> * dest, <span class="keyword">size_t</span> nbytes)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">bcmp</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> * str1, <span class="keyword">const</span> <span class="keyword">void</span> * str2, <span class="keyword">size_t</span> nbytes)</span></span>;</div></pre></td></tr></table></figure>
+<h3 id="地址转换函数"><a href="#地址转换函数" class="headerlink" title="地址转换函数"></a>地址转换函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;arpa/inte.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">inet_aton</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> * str, struct in_addr *addrptr)</span></span>;</div><div class="line"><span class="function"><span class="keyword">char</span> <span class="title">inet_ntoa</span><span class="params">(struct in_addr inaddr)</span></span>;</div></pre></td></tr></table></figure>
+<h3 id="新的地址转换函数"><a href="#新的地址转换函数" class="headerlink" title="新的地址转换函数"></a>新的地址转换函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure>
+<p>##基本TCP套接字编程<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">socket</span><span class="params">(<span class="keyword">int</span> family, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">bind</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> struct sockaddr * addr, <span class="keyword">size_t</span> len)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">listen</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> backlog)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">accept</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * clientaddr, <span class="keyword">size_t</span> * clientlen)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">connect</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> struct sockaddr * serveraddr, <span class="keyword">size_t</span> serverlen)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">fork</span><span class="params">(<span class="keyword">void</span>)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">exec</span><span class="params">()</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">close</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getsockname</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * addr, <span class="keyword">size_t</span> * len)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getpeername</span><span class="params">(<span class="keyword">int</span> fd, strcut sockaddr * addr, <span class="keyword">size_t</span> * len)</span></span>;</div></pre></td></tr></table></figure></p>
+<h3 id="socks函数"><a href="#socks函数" class="headerlink" title="socks函数"></a>socks函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></div><div class="line"><span class="comment">/*  </span></div><div class="line">* 创建套接字，返回文件描述符</div><div class="line">* family - 协议族，常用 AF_UNIX、AF_LOCAL、AF_INET4、AF_INET6 </div><div class="line">* type - socket类型，常用SCOK_STREAM、SOCK_DGRAM、SOCK_RAW</div><div class="line">* protoal - 通常为0</div><div class="line">* 返回值  返回-1失败，否则返回值为文件描述符。</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">socket</span><span class="params">(<span class="keyword">int</span> family, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span></span>;</div></pre></td></tr></table></figure>
+<h2 id="bind函数"><a href="#bind函数" class="headerlink" title="bind函数"></a>bind函数</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></div><div class="line"><span class="comment">/*</span></div><div class="line">* 绑定套接字地址</div><div class="line">* fd 文件描述符 </div><div class="line">* server_addr 填充好的sockaddr结构体。一般需要强制转换类型</div><div class="line">* len 结构体大小</div><div class="line">* 成功返回 0 </div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">bind</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * server_addr, <span class="keyword">size_t</span> len)</span></span>;</div></pre></td></tr></table></figure>
+<p>一般用法<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">int</span> result = bind(fd, (struct sockaddr *) &amp; server_addr, <span class="keyword">sizeof</span>(server_addr));</div><div class="line"></div><div class="line"><span class="keyword">if</span>(<span class="number">0</span> == result)</div><div class="line">&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"绑定[%s]:%d成功\n"</span>, inet_ntoa(server_addr.sin_addr.s_addr));</div><div class="line">    </div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span></div><div class="line">&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"绑定[%s]:%d失败\n"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="listen函数"><a href="#listen函数" class="headerlink" title="listen函数"></a>listen函数</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">listen</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> backlog)</span></span>;</div></pre></td></tr></table></figure>
+<p>listen函数监听套接字，传入套接字类型必须是<code>SOCK_STREAM</code> or <code>SOCK_SEQPACKET</code>.<br>backlog 最大队列数，当连接数超过这个值的时候，不接受新的连接<br>成功返回0，-1失败。</p>
+<h3 id="fork"><a href="#fork" class="headerlink" title="fork"></a>fork</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> ((pid = fork()) == <span class="number">0</span>)</div><div class="line">&#123;</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"hello from the child"</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span></div><div class="line">&#123;    </div><div class="line">    <span class="built_in">printf</span>(<span class="string">"hello from the parent"</span>)；</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>发现数P92页的错误</strong><br>92页很多函数调用的时候，函数名大小写错误。<br> <a href="https://www.amazon.cn/TCP-IP%E8%AF%A6%E8%A7%A3%C2%B7%E5%8D%B71-%E5%8D%8F%E8%AE%AE-%E5%87%AF%E6%96%87R-%E7%A6%8F%E5%B0%94/dp/B01HGINTJ2/ref=sr_1_2?ie=UTF8&amp;qid=1483255527&amp;sr=8-2&amp;keywords=tcpip%E8%AF%A6%E8%A7%A3" target="_blank" rel="external">TCP/IP详解·卷1:协议(原书第2版) 平装</a></p>
+<h3 id="值-结果类型参数"><a href="#值-结果类型参数" class="headerlink" title="值-结果类型参数"></a>值-结果类型参数</h3><p>使用getsockname函数获取套接字地址的时候，总是返回0.0.0.0.查了半天资料，才发现getsockname的最后一个参数len是”值-结果”类型参数。<br>也就是说，在调用函数前，len是addr的长度，函数返回由，len也是addr的长度，但是两个长度的含义不一样。一个是参数，一个是结果。</p>
+<p>值-结果类型函数都有:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">accept</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * clientaddr, <span class="keyword">size_t</span> * clientlen)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getsockname</span><span class="params">(<span class="keyword">int</span> fd, struct sockaddr * addr, <span class="keyword">size_t</span> * len)</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">getpeername</span><span class="params">(<span class="keyword">int</span> fd, strcut sockaddr * addr, <span class="keyword">size_t</span> * len)</span></span>;</div></pre></td></tr></table></figure></p>
+<p>被坑了一把 -.-!</p>
+<h2 id="waitpid"><a href="#waitpid" class="headerlink" title="waitpid"></a>waitpid</h2><p>waitpid()会暂时停止目前进程的执行，直到有信号来到或子进程结束。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;sys/types.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;sys/wait.h&gt;</span></span></div><div class="line"><span class="keyword">pid_t</span> waitpid(<span class="keyword">pid_t</span> pid, <span class="keyword">int</span> * status, <span class="keyword">int</span> options);</div></pre></td></tr></table></figure></p>
+<ol>
+<li>如果在调用 waitpid()时子进程已经结束,则 waitpid()会立即<br>返回子进程结束状态值</li>
+<li>子进程的结束状态值会由参数 status 返回,而子进程的进程识别码也会一起返回</li>
+<li>如果不在意结束状态值,则参数 status 可以设成 NULL。参数 pid 为欲等待的子进程识别码,<blockquote>
+<p><strong>参数pid</strong></p>
+<ol>
+<li>pid &lt; -1 等待进程组识别码为 pid 绝对值的任何子进程</li>
+</ol>
+</blockquote>
+</li>
+<li>pid = -1 等待任何子进程,相当于 wait()。</li>
+<li>pid = 0 等待进程组识别码与目前进程相同的任何子进程。</li>
+<li>pid &gt; 0 等待任何子进程识别码为 pid 的子进程</li>
+</ol>
+<blockquote>
+<p><strong>参数option</strong></p>
+<ol>
+<li>参数<code>options</code>提供了一些额外的选项来控制waitpid，参数 option 可以为 0 或可以用”|”运算符把它们连接起来使用，比如：<code>WNOHANG | WUNTRACED</code>。若不需要设置为零</li>
+<li><code>WNOHANG</code> 若pid指定的子进程没有结束，则<code>waitpid()</code>函数返回0，不予以等待。若结束，则返回该子进程的ID。</li>
+<li><code>WUNTRACED</code> 若子进程进入暂停状态，则马上返回，但子进程的结束状态不予以理会。<code>WIFSTOPPED(status)</code>宏确定返回值是否对应与一个暂停子进程。</li>
+</ol>
+<p><strong>参数status</strong><br>子进程的结束状态返回后存于status,底下有几个宏可判别结束情况:</p>
+<ol>
+<li><code>WIFEXITED(status)</code><br>如果若为正常结束子进程返回的状态，则为真；对于这种情况可执行<code>WEXITSTATUS(status)</code>，取子进程传给exit或_eixt的低8位。</li>
+<li><code>WEXITSTATUS(status)</code><br>取得子进程<code>exit()</code>返回的结束代码,一般会先用<code>WIFEXITED</code> 来判断是否正常结束才能使用此宏。</li>
+<li><code>WIFSIGNALED(status)</code><br>若为异常结束子进程返回的状态，则为真；对于这种情况可执行WTERMSIG(status)，取使子进程结束的信号编号。</li>
+<li><code>WTERMSIG(status)</code><br>取得子进程因信号而中止的信号代码,一般会先用 WIFSIGNALED 来判断后才使用此宏。</li>
+<li><code>WIFSTOPPED(status)</code><br>若为当前暂停子进程返回的状态，则为真；对于这种情况可执行WSTOPSIG(status)，取使子进程暂停的信号编号。</li>
+<li><code>WSTOPSIG(status)</code><br>取得引发子进程暂停的信号代码,一般会先用WIFSTOPPED来判断后才使用此宏。</li>
+</ol>
+</blockquote>
+<p>如果执行成功则返回子进程识别码(PID) ,如果有错误发生则返回返回值-1。失败原因存于 errno 中。</p>
+<h2 id="TCP-server-client编程"><a href="#TCP-server-client编程" class="headerlink" title="TCP server client编程"></a>TCP server client编程</h2><h2 id="项目"><a href="#项目" class="headerlink" title="项目"></a>项目</h2><p>之前做工作中接触过nginx服务器。对nginx的架构有一定了解，打算做一个类似的服务器。具体还没想好</p>
+<p>预备知识:</p>
+<ul>
+<li>网络编程相关</li>
+<li>服务器架构</li>
+<li><code>linux I\O</code>相关编程</li>
+<li>计算机网络</li>
+<li>操作系统原理</li>
+</ul>
+<p>可能用到的技术:</p>
+<ul>
+<li>DPDK</li>
+<li>mTCP</li>
+<li>协程</li>
+<li>内存管理</li>
+<li>libevent</li>
+<li>JIT</li>
+</ul>
+<p>这些都是我在工作中接触到的并且处在知其然而不知其所以然的状态，其中有些技术是冲突的，不能同时使用。希望在这个服务器中尽量的使用这些技术，完全是为了熟悉这些技术。最后可能做成四不像，然而这并不是很重要。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/unix/" rel="tag"># unix</a>
+          
+            <a href="/tags/program/" rel="tag"># program</a>
+          
+            <a href="/tags/network/" rel="tag"># network</a>
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/happy-new-year/" rel="next" title="新年快乐">
+                <i class="fa fa-chevron-left"></i> 新年快乐
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2017/UNIX-Network-program/"
+     data-title="UNIX网络编程"
+     data-content=""
+     data-url="http://0x7c00.com/2017/UNIX-Network-program/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/UNIX-Network-program/"
+           data-title="UNIX网络编程" data-url="http://0x7c00.com/2017/UNIX-Network-program/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Breaker" />
+          <p class="site-author-name" itemprop="name">Breaker</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/iBreaker" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/breaker" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-code"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.eyrefree.org/" title="荏苒。" target="_blank">荏苒。</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://blog.ookcode.com/" title="Vincent Yao" target="_blank">Vincent Yao</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://shumeipai.nxez.com/" title="树莓派实验室" target="_blank">树莓派实验室</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.leesec.com/" title="Leesec's Blog" target="_blank">Leesec's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#socket编程简介"><span class="nav-number">1.</span> <span class="nav-text">socket编程简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#套接字地址结构"><span class="nav-number">1.1.</span> <span class="nav-text">套接字地址结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主机字序和网络字序"><span class="nav-number">1.2.</span> <span class="nav-text">主机字序和网络字序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字节操作函数"><span class="nav-number">1.3.</span> <span class="nav-text">字节操作函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#地址转换函数"><span class="nav-number">1.4.</span> <span class="nav-text">地址转换函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新的地址转换函数"><span class="nav-number">1.5.</span> <span class="nav-text">新的地址转换函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#socks函数"><span class="nav-number">1.6.</span> <span class="nav-text">socks函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bind函数"><span class="nav-number">2.</span> <span class="nav-text">bind函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#listen函数"><span class="nav-number">2.1.</span> <span class="nav-text">listen函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fork"><span class="nav-number">2.2.</span> <span class="nav-text">fork</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#值-结果类型参数"><span class="nav-number">2.3.</span> <span class="nav-text">值-结果类型参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#waitpid"><span class="nav-number">3.</span> <span class="nav-text">waitpid</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP-server-client编程"><span class="nav-number">4.</span> <span class="nav-text">TCP server client编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目"><span class="nav-number">5.</span> <span class="nav-text">项目</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2012 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Breaker</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"breaker"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js?v=5.1.0"></script>
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>
