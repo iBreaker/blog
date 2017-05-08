@@ -30,7 +30,7 @@ segfault at 0   表示段错误发生的地址。这里是0，可以判断是�
          *   bit 4 ==                           1: fault was an instruction fetch
          */
     </span>
-
+<!-- more -->
 *   libzealot.so[7fcac98ea000+6c000]   错误发生的动态库。7fcac98ea000表示这次动态库加载的内存基地址，6c000是大小。
 
 ## 第二部  反汇编

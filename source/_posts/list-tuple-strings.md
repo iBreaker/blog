@@ -22,7 +22,6 @@ date: 2015-05-29 19:43:58
 &gt;&gt;&gt; type(temp)
 &lt;type 'list'&gt;
 </pre>
-<!--more-->
 
 *   用tuple() 可以将字符串和列表转化为元组
 <pre>&gt;&gt;&gt; demo_str = 'test' 
@@ -35,6 +34,8 @@ date: 2015-05-29 19:43:58
 &gt;&gt;&gt; type(temp)
 &lt;type 'tuple'&gt;
 </pre>
+
+<!--more-->
 
 *   用str() 可以将字符串和列表转化为字符串
 <pre>&gt;&gt;&gt; demo_str = 'test' 

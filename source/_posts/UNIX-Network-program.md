@@ -9,12 +9,13 @@ tags:
 ---
 unix网络编程知识总结
 
-<!-- more -->
+
 
 ## socket编程简介
 
 ### 套接字地址结构
 **POSIX通用数据类型**
+
 数据类型|说明|头文件
 --|--|--
 int8_t | 带符号的8位整数| `<sys/types.>`
@@ -28,6 +29,7 @@ socklen\_t|套接字地址长度的结构，一般为`uint32_t`|`<sys/socket.h>`
 in\_addr\_t|IPv4地址，一般为`uint32_t`|`<netinet/in.h>`
 in\_port\_t|端口号，一般为`uint16_t`|`<netinet/in.h>`
 
+<!-- more -->
 
 **IPv4网际套接字地址结构`重点`**
 ```cpp
