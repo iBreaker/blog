@@ -71,7 +71,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="GPU,mailbox,图像,汇编," />
+  <meta name="keywords" content="linux," />
 
 
 
@@ -89,17 +89,17 @@
 
 
 
-<meta name="description" content="要把我的操作系统移植到Raspberry Pi 上了，所以最近一直在看ARM的东西。找来找去只找到一个有点用的 http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/   剑桥大学的一份教程，虽然离一个完整的内核还差得很远，但对我还算是有点用。之前一直担心的GPU的问题也解决了，也是我找到的唯一一份和Raspberry Pi GPU编程">
-<meta name="keywords" content="GPU,mailbox,图像,汇编">
+<meta name="description" content="本文章主要记录linux如何变为工作环境，区别于Linux命令手册文章 发行版工作环境暂时选择deepin，原因如下:  工作环境离不开qq，ubuntu qq巨卡。基本只有deepin了。 开发比较活跃，有bug随时提交 觉得不过瘾可以自己修改bug 有需求随时提交 觉得不过瘾可以自己修改代码然后pull request 开发者中国人，交流方便  缺点:  稳定性有待考察  心得:  深度终端不">
+<meta name="keywords" content="linux">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Raspberry Pi GPU 编程">
-<meta property="og:url" content="http://0x7c00.com/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/index.html">
+<meta property="og:title" content="linux环境折腾">
+<meta property="og:url" content="http://0x7c00.com/2017/linux-env/index.html">
 <meta property="og:site_name" content="Breaker&#39;s Blog">
-<meta property="og:description" content="要把我的操作系统移植到Raspberry Pi 上了，所以最近一直在看ARM的东西。找来找去只找到一个有点用的 http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/   剑桥大学的一份教程，虽然离一个完整的内核还差得很远，但对我还算是有点用。之前一直担心的GPU的问题也解决了，也是我找到的唯一一份和Raspberry Pi GPU编程">
-<meta property="og:updated_time" content="2017-05-09T09:07:28.484Z">
+<meta property="og:description" content="本文章主要记录linux如何变为工作环境，区别于Linux命令手册文章 发行版工作环境暂时选择deepin，原因如下:  工作环境离不开qq，ubuntu qq巨卡。基本只有deepin了。 开发比较活跃，有bug随时提交 觉得不过瘾可以自己修改bug 有需求随时提交 觉得不过瘾可以自己修改代码然后pull request 开发者中国人，交流方便  缺点:  稳定性有待考察  心得:  深度终端不">
+<meta property="og:updated_time" content="2017-05-09T09:52:27.788Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Raspberry Pi GPU 编程">
-<meta name="twitter:description" content="要把我的操作系统移植到Raspberry Pi 上了，所以最近一直在看ARM的东西。找来找去只找到一个有点用的 http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/   剑桥大学的一份教程，虽然离一个完整的内核还差得很远，但对我还算是有点用。之前一直担心的GPU的问题也解决了，也是我找到的唯一一份和Raspberry Pi GPU编程">
+<meta name="twitter:title" content="linux环境折腾">
+<meta name="twitter:description" content="本文章主要记录linux如何变为工作环境，区别于Linux命令手册文章 发行版工作环境暂时选择deepin，原因如下:  工作环境离不开qq，ubuntu qq巨卡。基本只有deepin了。 开发比较活跃，有bug随时提交 觉得不过瘾可以自己修改bug 有需求随时提交 觉得不过瘾可以自己修改代码然后pull request 开发者中国人，交流方便  缺点:  稳定性有待考察  心得:  深度终端不">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://0x7c00.com/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/"/>
+  <link rel="canonical" href="http://0x7c00.com/2017/linux-env/"/>
 
 
 
 
 
-  <title> Raspberry Pi GPU 编程 | Breaker's Blog </title>
+  <title> linux环境折腾 | Breaker's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -302,7 +302,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://0x7c00.com/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/">
+    <link itemprop="mainEntityOfPage" href="http://0x7c00.com/2017/linux-env/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Breaker">
@@ -323,7 +323,7 @@
             
             
               
-                Raspberry Pi GPU 编程
+                linux环境折腾
               
             
           </h2>
@@ -338,8 +338,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2014-12-22T02:02:17+00:00">
-                2014-12-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-09T09:46:26+08:00">
+                2017-05-09
               </time>
             
 
@@ -349,28 +349,6 @@
           </span>
 
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Operating-System/" itemprop="url" rel="index">
-                    <span itemprop="name">Operating System</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
 
           
             
@@ -379,8 +357,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/" itemprop="commentCount"></span>
+                <a href="/2017/linux-env/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/linux-env/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -406,95 +384,73 @@
       
 
       
-        <p>要把我的操作系统移植到Raspberry Pi 上了，所以最近一直在看ARM的东西。找来找去只找到一个有点用的 <a href="http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/screen01.html#gs" title="http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/screen01.html#gs" target="_blank" rel="external">http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/</a>   剑桥大学的一份教程，虽然离一个完整的内核还差得很远，但对我还算是有点用。之前一直担心的GPU的问题也解决了，也是我找到的唯一一份和Raspberry Pi GPU编程相关的东西了。<a id="more"></a></p>
-<p>这次用到的是 2bit的 High Color   —  Use 16 bits to store each pixel, the first 5 bit representing the intensity of the red channel, the next 6 bits representing the intensity of the green channel and the final 5 bits representing the intensity of the blue channel</p>
-<p>&lt;!– [if IE 6]&gt;</p>
-<pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;../../../../style/ie6.css&quot; type=&quot;text/css&quot; media=&quot;screen&quot; /&gt;&lt;script type=&quot;text/javascript&quot; src=&quot;http://www.cam.ac.uk/global/js/minmax.js&quot;&gt;&lt;/script&gt;&lt;![endif]--&gt;&lt;!-- [if IE 7]&gt;
-&lt;link rel=&quot;stylesheet&quot; href=&quot;../../../../style/ie7.css&quot; type=&quot;text/css&quot; media=&quot;screen&quot; /&gt;&lt;![endif]--&gt;&lt;script src=&quot;//www.google-analytics.com/analytics.js&quot; async=&quot;&quot;&gt;&lt;/script&gt;&lt;script src=&quot;script.js&quot; type=&quot;text/javascript&quot; language=&quot;javascript&quot;&gt;&lt;/script&gt;&lt;script&gt;// &lt;![CDATA[
-</code></pre><p>(function(i,s,o,g,r,a,m){i[‘GoogleAnalyticsObject’]=r;i[r]=i[r]||function(){<br>  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),<br>  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)<br>  })(window,document,’script’,’//www.google-analytics.com/analytics.js’,’ga’);<br>  ga(‘create’, ‘UA-47341509-1’, ‘cam.ac.uk’);<br>  ga(‘send’, ‘pageview’);<br>// ]]&gt;</p>
-<p><div id="container"></div></p>
-<p><div id="content"></div></p>
-<p><div id="content-primary"></div></p>
-<p><div id="contentAll"></div></p>
-<p><div id="pageAll"></div></p>
-<p><div id="pageBody">  这么奇怪的启动方式。加电后GPU先启动，然后 ARM核才启动，两个处理器通过“邮件”的方式通信，详见</div></p>
-<p><div>    The Raspberry Pi has a very special and rather odd relationship with it’s graphics processor. On the Raspberry Pi, the graphics processor actually runs first, and is responsible for starting up the main processor. This is very unusual. Ultimately it doesn’t make too much difference, but in many interactions, it often feels like the processor is secondary, and the graphics processor is the most important. The two communicate on the Raspberry Pi by what is called the ‘mailbox’. Each can deposit mail for the other, which will be collected at some future point and then dealt with. We shall use the mailbox to ask the graphics processor for an address. The address will be a location to which we can write the pixel colour information for the screen, called a frame buffer, and the graphics card will regularly check this location, and update the pixels on the screen appropriately.</div></p>
-<p><div></div></p>
-<p><div>&lt;!– [if IE 6]&gt;</div></p>
-<pre><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;../../../../style/ie6.css&quot; type=&quot;text/css&quot; media=&quot;screen&quot; /&gt;&lt;script type=&quot;text/javascript&quot; src=&quot;http://www.cam.ac.uk/global/js/minmax.js&quot;&gt;&lt;/script&gt;&lt;![endif]--&gt;&lt;!-- [if IE 7]&gt;
-&lt;link rel=&quot;stylesheet&quot; href=&quot;../../../../style/ie7.css&quot; type=&quot;text/css&quot; media=&quot;screen&quot; /&gt;&lt;![endif]--&gt;&lt;script src=&quot;//www.google-analytics.com/analytics.js&quot; async=&quot;&quot; type=&quot;mce-no/type&quot;&gt;&lt;/script&gt;&lt;script src=&quot;script.js&quot; type=&quot;mce-text/javascript&quot; language=&quot;javascript&quot;&gt;&lt;/script&gt;&lt;script type=&quot;mce-no/type&quot;&gt;// &lt;![CDATA[
-</code></pre><p>(function(i,s,o,g,r,a,m){i[‘GoogleAnalyticsObject’]=r;i[r]=i[r]||function(){<br>  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),<br>  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)<br>  })(window,document,’script’,’//www.google-analytics.com/analytics.js’,’ga’);<br>  ga(‘create’, ‘UA-47341509-1’, ‘cam.ac.uk’);<br>  ga(‘send’, ‘pageview’);<br>// ]]&gt;</p>
-<p><div id="container"></div></p>
-<p><div id="content"></div></p>
-<p><div id="content-primary"></div></p>
-<p><div id="contentAll"></div></p>
-<p><div id="pageAll"></div></p>
-<p><div id="pageBody"></div></p>
-<p><table><caption>Table  - Mailbox Addresses</caption></table></p>
-<p><thead></thead></p>
-<p><tr></tr></p>
-<p><th>Address</th></p>
-<p><th>Size / Bytes</th></p>
-<p><th>Name</th></p>
-<p><th>Description</th></p>
-<p><th>Read / Write</th><br><br></p>
-<p><tbody></tbody></p>
-<p><tr></tr></p>
-<p><td>2000B880</td></p>
-<p><td>4</td></p>
-<p><td>Read</td></p>
-<p><td>Receiving mail.</td></p>
-<p><td>R</td><br></p>
-<p><tr></tr></p>
-<p><td>2000B890</td></p>
-<p><td>4</td></p>
-<p><td>Poll</td></p>
-<p><td>Receive without retrieving.</td></p>
-<p><td>R</td><br></p>
-<p><tr></tr></p>
-<p><td>2000B894</td></p>
-<p><td>4</td></p>
-<p><td>Sender</td></p>
-<p><td>Sender information.</td></p>
-<p><td>R</td><br></p>
-<p><tr></tr></p>
-<p><td>2000B898</td></p>
-<p><td>4</td></p>
-<p><td>Status</td></p>
-<p><td>Information.</td></p>
-<p><td>R</td><br></p>
-<p><tr></tr></p>
-<p><td>2000B89C</td></p>
-<p><td>4</td></p>
-<p><td>Configuration</td></p>
-<p><td>Settings.</td></p>
-<p><td>RW</td><br></p>
-<p><tr></tr></p>
-<p><td>2000B8A0</td></p>
-<p><td>4</td></p>
-<p><td>Write</td></p>
-<p><td>Sending mail.</td></p>
-<p><td>W</td><br><br><br><br>&nbsp;</p>
-<p>发送：</p>
-<p><div id="container"></div></p>
-<p><div id="content"></div></p>
-<p><div id="content-primary"></div></p>
-<p><div id="contentAll"></div></p>
-<p><div id="pageAll"></div></p>
-<div id="pageBody">
-
+        <p>本文章主要记录linux如何变为工作环境，区别于Linux命令手册文章</p>
+<h3 id="发行版"><a href="#发行版" class="headerlink" title="发行版"></a>发行版</h3><p>工作环境暂时选择<code>deepin</code>，原因如下:</p>
+<ul>
+<li>工作环境离不开qq，ubuntu qq巨卡。基本只有deepin了。</li>
+<li>开发比较活跃，有bug随时提交</li>
+<li>觉得不过瘾可以自己修改bug</li>
+<li>有需求随时提交</li>
+<li>觉得不过瘾可以自己修改代码然后<code>pull request</code></li>
+<li>开发者中国人，交流方便</li>
+</ul>
+<p>缺点:</p>
+<ul>
+<li>稳定性有待考察</li>
+</ul>
+<p>心得:</p>
+<ul>
+<li>深度终端不错，颜值高，实用。</li>
+<li>终端雷神模式不错。<code>alt + F2</code>打开隐藏，使用方便。</li>
+<li>基本满足工作环境<ul>
+<li><strong>即时通信</strong> - QQ 跑起来虽然还是很耗资源，但是问题不大</li>
+<li><strong>email</strong> - ThunderBird/Mutt 正在折腾中</li>
+<li><strong>linux开发环境</strong> - 和工作开发环境一样，不用和以前一样跑虚拟机了。</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+<h3 id="编辑器"><a href="#编辑器" class="headerlink" title="编辑器"></a>编辑器</h3><h4 id="键盘映射"><a href="#键盘映射" class="headerlink" title="键盘映射"></a>键盘映射</h4><p>deepin 上替换<code>esc</code>和<code>caps lock</code>因为<code>acps locl</code>基本没什么用还占地方<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">gsettings <span class="built_in">set</span> com.deepin.dde.keybinding.mediakey capslock <span class="string">'[]'</span></div><div class="line">gsettings <span class="built_in">set</span> com.deepin.dde.keyboard layout-options <span class="string">'["caps:swapescape"]'</span></div></pre></td></tr></table></figure></p>
+<h4 id="VIM主题"><a href="#VIM主题" class="headerlink" title="VIM主题"></a>VIM主题</h4><p>暂时使用<code>oh-my-zsh</code>适不适合开发有待考察。</p>
+<h3 id="终端"><a href="#终端" class="headerlink" title="终端"></a>终端</h3><p>深度的终端做的不错，颜值很高。<br><strong>强烈推荐<code>alt + f2</code>雷神模式</strong></p>
+<p>不喜欢bash，装个zsh吧。</p>
+<h4 id="zsh主题"><a href="#zsh主题" class="headerlink" title="zsh主题"></a>zsh主题</h4><p>可以选择random 然后看到自己喜欢的在设置</p>
 <ol>
-<li>The sender waits until the Status field has a 0 in the top bit.</li>
-<li><p>The sender writes to Write such that the lowest 4 bits are the mailbox to write to, and the upper 28 bits are the message to write.<br>接收:</p>
+<li><code>agnoster</code></li>
+<li><code>sonicradish</code></li>
+</ol>
+<h4 id="zsh插件"><a href="#zsh插件" class="headerlink" title="zsh插件"></a>zsh插件</h4><ul>
+<li><code>autojump</code> 自动跳转目录的工具，配合zsh使用</li>
+<li><code>zsh-autosuggestions</code>  自动命令补全</li>
+<li><code>asciinema</code> 录制文本终端</li>
+</ul>
+<h3 id="mail"><a href="#mail" class="headerlink" title="mail"></a>mail</h3><p>在win下面，习惯用foxmail。Linux下面用下面这两个把</p>
+<ul>
+<li>ThunderBird <em>图像界面</em><ol>
+<li>安装MinimizeToTray revived (MinTrayR)插件，安装完后需要设置一下就可以让Thunderbird支持后台运行。</li>
+</ol>
 </li>
-<li><p>The receiver waits until the Status field has a 0 in the 30th bit.</p>
+<li>Mutt <em>终端</em> <ol>
+<li><a href="https://wiki.archlinux.org/index.php/mutt" target="_blank" rel="external">比较友好的文档 - <em>来自arch wiki</em></a> </li>
+<li><strong>安装:</strong> 用 aptitude 安装即可 </li>
+<li><strong>配置:</strong><ol>
+<li>新建配置文件: <code>~/.muttrc</code>或者<code>~/.mutt/muttrc</code>，安装完后没有这两个文件，我自己新建了一个。如下配置可以正常收取邮件。</li>
+</ol>
 </li>
-<li>The receiver reads from Read.</li>
-<li><p>The receiver confirms the message is for the correct mailbox, and tries again if not.<br></p></li></ol></div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>&lt;!– [if IE 6]&gt;<p></p>
-<p><link rel="stylesheet" href="../../../../style/ie6.css" type="text/css" media="screen"><script type="text/javascript" src="http://www.cam.ac.uk/global/js/minmax.js"></script>&lt;![endif]–&gt;<!-- [if IE 7]>
-<link rel="stylesheet" href="../../../../style/ie7.css" type="text/css" media="screen" /><![endif]--><script src="//www.google-analytics.com/analytics.js" async type="mce-no/type"></script><script src="script.js" type="mce-text/javascript" language="javascript"></script><script type="mce-no/type">// &lt;![CDATA[<br>(function(i,s,o,g,r,a,m){i[‘GoogleAnalyticsObject’]=r;i[r]=i[r]||function(){<br>(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),<br>m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)<br>})(window,document,’script’,’//www.google-analytics.com/analytics.js’,’ga’);<br>ga(‘create’, ‘UA-47341509-1’, ‘cam.ac.uk’);<br>ga(‘send’, ‘pageview’);<br>// ]]&gt;</script></p>
-
-
+</ol>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">set</span> imap_user   = 791628659</div><div class="line"><span class="built_in">set</span> imap_pass   = ****************</div><div class="line"><span class="built_in">set</span> folder      = imaps://imap.qq.com/</div><div class="line"><span class="built_in">set</span> spoolfile   = +INBOX</div><div class="line"><span class="comment">#mailboxes       = +INBOX</span></div><div class="line"><span class="comment">#set imap_check_subscribed</span></div><div class="line"><span class="comment">#</span></div><div class="line"><span class="comment">#set header_cache = ~/.cache/mutt</span></div><div class="line"><span class="comment">#set message_cachedir = "~/.cache/mutt"</span></div><div class="line"></div><div class="line"><span class="comment">#unset imap_passive</span></div><div class="line"><span class="comment">#set imap_keepalive = 300</span></div><div class="line"><span class="comment"># How often to check for new mail (time in seconds).</span></div><div class="line"><span class="comment">#set mail_check = 120</span></div><div class="line"></div><div class="line"><span class="built_in">set</span> my_name = <span class="string">"Breaker"</span></div></pre></td></tr></table></figure>
+<h3 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h3><ul>
+<li><a href="https://wiki.deepin.org/index.php?title=%E7%BD%91%E7%BB%9C%E7%AE%A1%E7%90%86" target="_blank" rel="external">linux网络配置</a><h3 id="deepin"><a href="#deepin" class="headerlink" title="deepin"></a>deepin</h3></li>
+<li><a href="https://wiki.deepin.org/index.php?title=%E8%87%AA%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F" target="_blank" rel="external">deepin自启动</a></li>
+</ul>
+<h3 id="微信"><a href="#微信" class="headerlink" title="微信"></a>微信</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">https://github.com/geeeeeeeeek/electronic-wechat</div><div class="line">npm config set registry https://registry.npm.taobao.org</div><div class="line">npm config get registry</div></pre></td></tr></table></figure>
+<p>添加一个软连接到/usr/bin即可<br>在/usr/share/applications中添加wechat.desktop </p>
+<p>2017-05-09 09:45:08<br>最新的deepin上已经集成了lectronic-wechat</p>
+<h3 id="其他小工具"><a href="#其他小工具" class="headerlink" title="其他小工具"></a>其他小工具</h3><ul>
+<li>workrave 定时休息，deepin上运行良好</li>
+</ul>
 
       
     </div>
@@ -518,13 +474,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/GPU/" rel="tag"># GPU</a>
-          
-            <a href="/tags/mailbox/" rel="tag"># mailbox</a>
-          
-            <a href="/tags/图像/" rel="tag"># 图像</a>
-          
-            <a href="/tags/汇编/" rel="tag"># 汇编</a>
+            <a href="/tags/linux/" rel="tag"># linux</a>
           
         </div>
       
@@ -537,8 +487,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2014/ps2-mouse/" rel="next" title="PS2鼠标中断信号的处理">
-                <i class="fa fa-chevron-left"></i> PS2鼠标中断信号的处理
+              <a href="/2017/UNIX-Network-program/" rel="next" title="UNIX网络编程">
+                <i class="fa fa-chevron-left"></i> UNIX网络编程
               </a>
             
           </div>
@@ -546,10 +496,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2015/list-tuple-strings/" rel="prev" title="列表，元组，字符串互相转换">
-                列表，元组，字符串互相转换 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -564,10 +510,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/"
-     data-title="Raspberry Pi GPU 编程"
+        <div class="ds-share flat" data-thread-key="2017/linux-env/"
+     data-title="linux环境折腾"
      data-content=""
-     data-url="http://0x7c00.com/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/">
+     data-url="http://0x7c00.com/2017/linux-env/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -594,8 +540,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/"
-           data-title="Raspberry Pi GPU 编程" data-url="http://0x7c00.com/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/">
+      <div class="ds-thread" data-thread-key="2017/linux-env/"
+           data-title="linux环境折腾" data-url="http://0x7c00.com/2017/linux-env/">
       </div>
     
   </div>
@@ -619,8 +565,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
@@ -735,6 +690,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#发行版"><span class="nav-number">1.</span> <span class="nav-text">发行版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑器"><span class="nav-number">2.</span> <span class="nav-text">编辑器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#键盘映射"><span class="nav-number">2.1.</span> <span class="nav-text">键盘映射</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#VIM主题"><span class="nav-number">2.2.</span> <span class="nav-text">VIM主题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#终端"><span class="nav-number">3.</span> <span class="nav-text">终端</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#zsh主题"><span class="nav-number">3.1.</span> <span class="nav-text">zsh主题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#zsh插件"><span class="nav-number">3.2.</span> <span class="nav-text">zsh插件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mail"><span class="nav-number">4.</span> <span class="nav-text">mail</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络配置"><span class="nav-number">5.</span> <span class="nav-text">网络配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#deepin"><span class="nav-number">6.</span> <span class="nav-text">deepin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#微信"><span class="nav-number">7.</span> <span class="nav-text">微信</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他小工具"><span class="nav-number">8.</span> <span class="nav-text">其他小工具</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

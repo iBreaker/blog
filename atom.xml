@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://0x7c00.com/"/>
-  <updated>2017-05-09T09:07:28.484Z</updated>
+  <updated>2017-05-09T09:52:27.788Z</updated>
   <id>http://0x7c00.com/</id>
   
   <author>
@@ -14,6 +14,117 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>linux环境折腾</title>
+    <link href="http://0x7c00.com/2017/linux-env/"/>
+    <id>http://0x7c00.com/2017/linux-env/</id>
+    <published>2017-05-09T01:46:26.000Z</published>
+    <updated>2017-05-09T09:52:27.788Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文章主要记录linux如何变为工作环境，区别于Linux命令手册文章</p>
+<h3 id="发行版"><a href="#发行版" class="headerlink" title="发行版"></a>发行版</h3><p>工作环境暂时选择<code>deepin</code>，原因如下:</p>
+<ul>
+<li>工作环境离不开qq，ubuntu qq巨卡。基本只有deepin了。</li>
+<li>开发比较活跃，有bug随时提交</li>
+<li>觉得不过瘾可以自己修改bug</li>
+<li>有需求随时提交</li>
+<li>觉得不过瘾可以自己修改代码然后<code>pull request</code></li>
+<li>开发者中国人，交流方便</li>
+</ul>
+<p>缺点:</p>
+<ul>
+<li>稳定性有待考察</li>
+</ul>
+<p>心得:</p>
+<ul>
+<li>深度终端不错，颜值高，实用。</li>
+<li>终端雷神模式不错。<code>alt + F2</code>打开隐藏，使用方便。</li>
+<li>基本满足工作环境<ul>
+<li><strong>即时通信</strong> - QQ 跑起来虽然还是很耗资源，但是问题不大</li>
+<li><strong>email</strong> - ThunderBird/Mutt 正在折腾中</li>
+<li><strong>linux开发环境</strong> - 和工作开发环境一样，不用和以前一样跑虚拟机了。</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+<h3 id="编辑器"><a href="#编辑器" class="headerlink" title="编辑器"></a>编辑器</h3><h4 id="键盘映射"><a href="#键盘映射" class="headerlink" title="键盘映射"></a>键盘映射</h4><p>deepin 上替换<code>esc</code>和<code>caps lock</code>因为<code>acps locl</code>基本没什么用还占地方<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">gsettings <span class="built_in">set</span> com.deepin.dde.keybinding.mediakey capslock <span class="string">'[]'</span></div><div class="line">gsettings <span class="built_in">set</span> com.deepin.dde.keyboard layout-options <span class="string">'["caps:swapescape"]'</span></div></pre></td></tr></table></figure></p>
+<h4 id="VIM主题"><a href="#VIM主题" class="headerlink" title="VIM主题"></a>VIM主题</h4><p>暂时使用<code>oh-my-zsh</code>适不适合开发有待考察。</p>
+<h3 id="终端"><a href="#终端" class="headerlink" title="终端"></a>终端</h3><p>深度的终端做的不错，颜值很高。<br><strong>强烈推荐<code>alt + f2</code>雷神模式</strong></p>
+<p>不喜欢bash，装个zsh吧。</p>
+<h4 id="zsh主题"><a href="#zsh主题" class="headerlink" title="zsh主题"></a>zsh主题</h4><p>可以选择random 然后看到自己喜欢的在设置</p>
+<ol>
+<li><code>agnoster</code></li>
+<li><code>sonicradish</code></li>
+</ol>
+<h4 id="zsh插件"><a href="#zsh插件" class="headerlink" title="zsh插件"></a>zsh插件</h4><ul>
+<li><code>autojump</code> 自动跳转目录的工具，配合zsh使用</li>
+<li><code>zsh-autosuggestions</code>  自动命令补全</li>
+<li><code>asciinema</code> 录制文本终端</li>
+</ul>
+<h3 id="mail"><a href="#mail" class="headerlink" title="mail"></a>mail</h3><p>在win下面，习惯用foxmail。Linux下面用下面这两个把</p>
+<ul>
+<li>ThunderBird <em>图像界面</em><ol>
+<li>安装MinimizeToTray revived (MinTrayR)插件，安装完后需要设置一下就可以让Thunderbird支持后台运行。</li>
+</ol>
+</li>
+<li>Mutt <em>终端</em> <ol>
+<li><a href="https://wiki.archlinux.org/index.php/mutt" target="_blank" rel="external">比较友好的文档 - <em>来自arch wiki</em></a> </li>
+<li><strong>安装:</strong> 用 aptitude 安装即可 </li>
+<li><strong>配置:</strong><ol>
+<li>新建配置文件: <code>~/.muttrc</code>或者<code>~/.mutt/muttrc</code>，安装完后没有这两个文件，我自己新建了一个。如下配置可以正常收取邮件。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">set</span> imap_user   = 791628659</div><div class="line"><span class="built_in">set</span> imap_pass   = ****************</div><div class="line"><span class="built_in">set</span> folder      = imaps://imap.qq.com/</div><div class="line"><span class="built_in">set</span> spoolfile   = +INBOX</div><div class="line"><span class="comment">#mailboxes       = +INBOX</span></div><div class="line"><span class="comment">#set imap_check_subscribed</span></div><div class="line"><span class="comment">#</span></div><div class="line"><span class="comment">#set header_cache = ~/.cache/mutt</span></div><div class="line"><span class="comment">#set message_cachedir = "~/.cache/mutt"</span></div><div class="line"></div><div class="line"><span class="comment">#unset imap_passive</span></div><div class="line"><span class="comment">#set imap_keepalive = 300</span></div><div class="line"><span class="comment"># How often to check for new mail (time in seconds).</span></div><div class="line"><span class="comment">#set mail_check = 120</span></div><div class="line"></div><div class="line"><span class="built_in">set</span> my_name = <span class="string">"Breaker"</span></div></pre></td></tr></table></figure>
+<h3 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h3><ul>
+<li><a href="https://wiki.deepin.org/index.php?title=%E7%BD%91%E7%BB%9C%E7%AE%A1%E7%90%86" target="_blank" rel="external">linux网络配置</a><h3 id="deepin"><a href="#deepin" class="headerlink" title="deepin"></a>deepin</h3></li>
+<li><a href="https://wiki.deepin.org/index.php?title=%E8%87%AA%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F" target="_blank" rel="external">deepin自启动</a></li>
+</ul>
+<h3 id="微信"><a href="#微信" class="headerlink" title="微信"></a>微信</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">https://github.com/geeeeeeeeek/electronic-wechat</div><div class="line">npm config set registry https://registry.npm.taobao.org</div><div class="line">npm config get registry</div></pre></td></tr></table></figure>
+<p>添加一个软连接到/usr/bin即可<br>在/usr/share/applications中添加wechat.desktop </p>
+<p>2017-05-09 09:45:08<br>最新的deepin上已经集成了lectronic-wechat</p>
+<h3 id="其他小工具"><a href="#其他小工具" class="headerlink" title="其他小工具"></a>其他小工具</h3><ul>
+<li>workrave 定时休息，deepin上运行良好</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文章主要记录linux如何变为工作环境，区别于Linux命令手册文章&lt;/p&gt;
+&lt;h3 id=&quot;发行版&quot;&gt;&lt;a href=&quot;#发行版&quot; class=&quot;headerlink&quot; title=&quot;发行版&quot;&gt;&lt;/a&gt;发行版&lt;/h3&gt;&lt;p&gt;工作环境暂时选择&lt;code&gt;deepin&lt;/code&gt;，原因如下:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;工作环境离不开qq，ubuntu qq巨卡。基本只有deepin了。&lt;/li&gt;
+&lt;li&gt;开发比较活跃，有bug随时提交&lt;/li&gt;
+&lt;li&gt;觉得不过瘾可以自己修改bug&lt;/li&gt;
+&lt;li&gt;有需求随时提交&lt;/li&gt;
+&lt;li&gt;觉得不过瘾可以自己修改代码然后&lt;code&gt;pull request&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;开发者中国人，交流方便&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;缺点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;稳定性有待考察&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;心得:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;深度终端不错，颜值高，实用。&lt;/li&gt;
+&lt;li&gt;终端雷神模式不错。&lt;code&gt;alt + F2&lt;/code&gt;打开隐藏，使用方便。&lt;/li&gt;
+&lt;li&gt;基本满足工作环境&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;即时通信&lt;/strong&gt; - QQ 跑起来虽然还是很耗资源，但是问题不大&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;email&lt;/strong&gt; - ThunderBird/Mutt 正在折腾中&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;linux开发环境&lt;/strong&gt; - 和工作开发环境一样，不用和以前一样跑虚拟机了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+    
+      <category term="linux" scheme="http://0x7c00.com/tags/linux/"/>
+    
+  </entry>
   
   <entry>
     <title>UNIX网络编程</title>
