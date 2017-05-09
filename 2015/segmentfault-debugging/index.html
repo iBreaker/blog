@@ -95,7 +95,7 @@
 <meta property="og:url" content="http://0x7c00.com/2015/segmentfault-debugging/index.html">
 <meta property="og:site_name" content="Breaker&#39;s Blog">
 <meta property="og:description" content="今天修改了一个段错误的bug。 第一步  用dmesg命令查看最近的段错误。[Mon Sep 14 15:11:50 2015] class[4200]: segfault at 0 ip 00007fcac993dbdd sp 00007fcaca4f5ac8 error 4 in libzealot.so[7fcac98ea000+6c000] segfault at 0   表示段错误发生的">
-<meta property="og:updated_time" content="2017-05-08T17:19:24.599Z">
+<meta property="og:updated_time" content="2017-05-08T18:08:16.251Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux 段错误调试">
 <meta name="twitter:description" content="今天修改了一个段错误的bug。 第一步  用dmesg命令查看最近的段错误。[Mon Sep 14 15:11:50 2015] class[4200]: segfault at 0 ip 00007fcac993dbdd sp 00007fcaca4f5ac8 error 4 in libzealot.so[7fcac98ea000+6c000] segfault at 0   表示段错误发生的">
@@ -433,9 +433,8 @@
 *   bit 4 ==                           1: fault was an instruction fetch
 */
 </code></pre><p></p>
-</li>
-<li><p>libzealot.so[7fcac98ea000+6c000]   错误发生的动态库。7fcac98ea000表示这次动态库加载的内存基地址，6c000是大小。</p>
-</li>
+<a id="more"></a></li>
+<li>libzealot.so[7fcac98ea000+6c000]   错误发生的动态库。7fcac98ea000表示这次动态库加载的内存基地址，6c000是大小。</li>
 </ul>
 <h2 id="第二部-反汇编"><a href="#第二部-反汇编" class="headerlink" title="第二部  反汇编"></a>第二部  反汇编</h2><p>objdump -d zealot.so &gt; zealot.dump</p>
 <h2 id="第三部-定位"><a href="#第三部-定位" class="headerlink" title="第三部 定位"></a>第三部 定位</h2><p>0x00007fcac993dbdd   - 0x7fcac98ea000 = 0x53bdd。在zealot.dump中找53bdd 定位到代码</p>
@@ -478,8 +477,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/mediawiki/" rel="next" title="MediaWiki">
-                <i class="fa fa-chevron-left"></i> MediaWiki
+              <a href="/2015/list-tuple-strings/" rel="next" title="列表，元组，字符串互相转换">
+                <i class="fa fa-chevron-left"></i> 列表，元组，字符串互相转换
               </a>
             
           </div>
@@ -585,7 +584,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

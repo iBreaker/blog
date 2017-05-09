@@ -89,17 +89,17 @@
 
 
 
-<meta name="description" content="列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。  用list可以把字符串和元组转化为列表&amp;gt;&amp;gt;&amp;gt; demo_str = ‘test’&amp;gt;&amp;gt;&amp;gt; demo_tuple = (‘t’,’e’,’s’,’t’)&amp;gt;&amp;gt;&amp;gt;demo_list = [‘t’,’e’,’s’,’t’]&amp;gt;&amp;gt;&amp;g">
+<meta name="description" content="列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。  用list可以把字符串和元组转化为列表 &amp;gt;&amp;gt;&amp;gt; demo_str = &apos;test&apos;  &amp;gt;&amp;gt;&amp;gt; demo_tuple = (&apos;t&apos;,&apos;e&apos;,&apos;s&apos;,&apos;t&apos;) &amp;gt;&amp;gt;&amp;gt;demo_list = [&apos;t&apos;,&apos;e&apos;,&apos;s&apos;,&apos;t&apos;] &amp;gt;&amp;">
 <meta name="keywords" content="print,python">
 <meta property="og:type" content="article">
 <meta property="og:title" content="列表，元组，字符串互相转换">
 <meta property="og:url" content="http://0x7c00.com/2015/list-tuple-strings/index.html">
 <meta property="og:site_name" content="Breaker&#39;s Blog">
-<meta property="og:description" content="列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。  用list可以把字符串和元组转化为列表&amp;gt;&amp;gt;&amp;gt; demo_str = ‘test’&amp;gt;&amp;gt;&amp;gt; demo_tuple = (‘t’,’e’,’s’,’t’)&amp;gt;&amp;gt;&amp;gt;demo_list = [‘t’,’e’,’s’,’t’]&amp;gt;&amp;gt;&amp;g">
-<meta property="og:updated_time" content="2017-05-08T17:19:24.599Z">
+<meta property="og:description" content="列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。  用list可以把字符串和元组转化为列表 &amp;gt;&amp;gt;&amp;gt; demo_str = &apos;test&apos;  &amp;gt;&amp;gt;&amp;gt; demo_tuple = (&apos;t&apos;,&apos;e&apos;,&apos;s&apos;,&apos;t&apos;) &amp;gt;&amp;gt;&amp;gt;demo_list = [&apos;t&apos;,&apos;e&apos;,&apos;s&apos;,&apos;t&apos;] &amp;gt;&amp;">
+<meta property="og:updated_time" content="2017-05-08T18:12:01.019Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="列表，元组，字符串互相转换">
-<meta name="twitter:description" content="列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。  用list可以把字符串和元组转化为列表&amp;gt;&amp;gt;&amp;gt; demo_str = ‘test’&amp;gt;&amp;gt;&amp;gt; demo_tuple = (‘t’,’e’,’s’,’t’)&amp;gt;&amp;gt;&amp;gt;demo_list = [‘t’,’e’,’s’,’t’]&amp;gt;&amp;gt;&amp;g">
+<meta name="twitter:description" content="列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。  用list可以把字符串和元组转化为列表 &amp;gt;&amp;gt;&amp;gt; demo_str = &apos;test&apos;  &amp;gt;&amp;gt;&amp;gt; demo_tuple = (&apos;t&apos;,&apos;e&apos;,&apos;s&apos;,&apos;t&apos;) &amp;gt;&amp;gt;&amp;gt;demo_list = [&apos;t&apos;,&apos;e&apos;,&apos;s&apos;,&apos;t&apos;] &amp;gt;&amp;">
 
 
 
@@ -408,8 +408,17 @@
       
         <p>列表，元组，字符串之间的转化通过join(), str(), list(), tuple() 这四个函数实现。</p>
 <ul>
-<li><p>用list可以把字符串和元组转化为列表<br><pre>&gt;&gt;&gt; demo_str = ‘test’<br>&gt;&gt;&gt; demo_tuple = (‘t’,’e’,’s’,’t’)<br>&gt;&gt;&gt;demo_list = [‘t’,’e’,’s’,’t’]<br>&gt;&gt;&gt; temp = list(demo_tuple)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘list’&gt;<br>&gt;&gt;&gt; temp = list(demo_str)<br>&gt;&gt;&gt; type(temp)<br>&lt;type ‘list’&gt;<br></pre></p>
-<a id="more"></a>
+<li><p>用list可以把字符串和元组转化为列表</p>
+<pre>&gt;&gt;&gt; demo_str = 'test' 
+&gt;&gt;&gt; demo_tuple = ('t','e','s','t')
+&gt;&gt;&gt;demo_list = ['t','e','s','t']
+&gt;&gt;&gt; temp = list(demo_tuple)
+&gt;&gt;&gt; type(temp)
+&lt;type 'list'&gt;
+&gt;&gt;&gt; temp = list(demo_str)
+&gt;&gt;&gt; type(temp)
+&lt;type 'list'&gt;
+</pre>
 </li>
 <li><p>用tuple() 可以将字符串和列表转化为元组</p>
 <pre>&gt;&gt;&gt; demo_str = 'test' 
@@ -422,9 +431,12 @@
 &gt;&gt;&gt; type(temp)
 &lt;type 'tuple'&gt;
 </pre>
+
 </li>
-<li><p>用str() 可以将字符串和列表转化为字符串</p>
-<pre>&gt;&gt;&gt; demo_str = 'test' 
+</ul>
+<a id="more"></a>
+<ul>
+<li>用str() 可以将字符串和列表转化为字符串<pre>&gt;&gt;&gt; demo_str = 'test' 
 &gt;&gt;&gt; demo_tuple = ('t','e','s','t')
 &gt;&gt;&gt;demo_list = ['t','e','s','t']
 &gt;&gt;&gt; temp = str(demo_list)
@@ -482,8 +494,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2014/raspberry-pi-timer/" rel="next" title="Raspberry Pi Timer">
-                <i class="fa fa-chevron-left"></i> Raspberry Pi Timer
+              <a href="/2014/raspberry-pi-gpu-e7-bc-96-e7-a8-8b/" rel="next" title="Raspberry Pi GPU 编程">
+                <i class="fa fa-chevron-left"></i> Raspberry Pi GPU 编程
               </a>
             
           </div>
@@ -492,8 +504,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/mediawiki/" rel="prev" title="MediaWiki">
-                MediaWiki <i class="fa fa-chevron-right"></i>
+              <a href="/2015/segmentfault-debugging/" rel="prev" title="Linux 段错误调试">
+                Linux 段错误调试 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -589,7 +601,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
